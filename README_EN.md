@@ -116,7 +116,7 @@ python -m pytest
 
 ### Configuration
 
-Edit `.env`. Keep real API keys local and out of git.
+Edit `.env`:
 
 | Variable | Default | Description |
 |---|---|---|
@@ -174,6 +174,75 @@ streamlit run app/streamlit_app.py
 ```
 
 Open `http://localhost:8501`, click `Build Index`, ask a question, and inspect the answer, retrieved contexts, unsupported spans, and metrics.
+
+### Run Results
+
+Baseline output:
+
+```text
+Saved 5 rows to results/baseline_results.csv
+avg_faithfulness: 1.0000
+avg_answer_relevancy: 0.3919
+avg_context_precision: 0.4000
+avg_hallucination_rate: 0.0000
+```
+
+Baseline metrics:
+
+| Metric | Value |
+|---|---:|
+| Samples | 5 |
+| avg_faithfulness | 1.0000 |
+| avg_answer_relevancy | 0.3919 |
+| avg_context_precision | 0.4000 |
+| avg_hallucination_rate | 0.0000 |
+
+Ablation output:
+
+```text
+[1/10] Running chunk_size_256
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[2/10] Running chunk_size_512
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[3/10] Running chunk_size_1024
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[4/10] Running top_k_3
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[5/10] Running top_k_5
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[6/10] Running top_k_8
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[7/10] Running query_rewrite_false
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[8/10] Running query_rewrite_true
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[9/10] Running reranker_false
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[10/10] Running reranker_true
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+Saved 10 ablation rows to results/ablation_results.csv
+```
+
+Ablation summary:
+
+| Setting | Faithfulness | Answer Relevancy | Context Precision | Hallucination Rate |
+|---|---:|---:|---:|---:|
+| chunk_size_256 | 1.0000 | 0.2417 | 0.2800 | 0.0000 |
+| chunk_size_512 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+| chunk_size_1024 | 1.0000 | 0.3253 | 1.0000 | 0.0000 |
+| top_k_3 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+| top_k_5 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+| top_k_8 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+
+Generated plots:
+
+![Chunk Size Hallucination Rate](docs/assets/chunk_size_hallucination_rate.png)
+
+![Top-K Faithfulness](docs/assets/top_k_faithfulness.png)
+
+![Baseline vs Reranker](docs/assets/baseline_vs_reranker.png)
+
+![Baseline vs Query Rewrite](docs/assets/baseline_vs_query_rewrite.png)
 
 ### Outputs
 

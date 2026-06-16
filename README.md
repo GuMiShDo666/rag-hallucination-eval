@@ -116,7 +116,7 @@ python -m pytest
 
 ### 环境变量
 
-编辑 `.env`。真实密钥只保存在本地，不要提交到 GitHub。
+编辑 `.env`：
 
 | 变量 | 默认值 | 说明 |
 |---|---|---|
@@ -174,6 +174,75 @@ streamlit run app/streamlit_app.py
 ```
 
 打开 `http://localhost:8501`，点击 `Build Index`，输入问题后点击 `Ask`，即可查看生成答案、检索上下文、unsupported spans 和评测指标。
+
+### 运行结果展示
+
+baseline 运行输出：
+
+```text
+Saved 5 rows to results/baseline_results.csv
+avg_faithfulness: 1.0000
+avg_answer_relevancy: 0.3919
+avg_context_precision: 0.4000
+avg_hallucination_rate: 0.0000
+```
+
+baseline 指标：
+
+| 指标 | 结果 |
+|---|---:|
+| 样本数量 | 5 |
+| avg_faithfulness | 1.0000 |
+| avg_answer_relevancy | 0.3919 |
+| avg_context_precision | 0.4000 |
+| avg_hallucination_rate | 0.0000 |
+
+消融实验运行输出：
+
+```text
+[1/10] Running chunk_size_256
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[2/10] Running chunk_size_512
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[3/10] Running chunk_size_1024
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[4/10] Running top_k_3
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[5/10] Running top_k_5
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[6/10] Running top_k_8
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[7/10] Running query_rewrite_false
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[8/10] Running query_rewrite_true
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[9/10] Running reranker_false
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+[10/10] Running reranker_true
+  ok faithfulness=1.0000 hallucination_rate=0.0000
+Saved 10 ablation rows to results/ablation_results.csv
+```
+
+消融实验汇总：
+
+| setting | faithfulness | answer_relevancy | context_precision | hallucination_rate |
+|---|---:|---:|---:|---:|
+| chunk_size_256 | 1.0000 | 0.2417 | 0.2800 | 0.0000 |
+| chunk_size_512 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+| chunk_size_1024 | 1.0000 | 0.3253 | 1.0000 | 0.0000 |
+| top_k_3 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+| top_k_5 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+| top_k_8 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
+
+图表输出：
+
+![Chunk Size Hallucination Rate](docs/assets/chunk_size_hallucination_rate.png)
+
+![Top-K Faithfulness](docs/assets/top_k_faithfulness.png)
+
+![Baseline vs Reranker](docs/assets/baseline_vs_reranker.png)
+
+![Baseline vs Query Rewrite](docs/assets/baseline_vs_query_rewrite.png)
 
 ### 输出文件
 
