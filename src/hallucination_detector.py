@@ -229,7 +229,17 @@ def split_into_claims(answer: str) -> list[str]:
     if not cleaned:
         return []
     parts = re.split(r"(?<=[.!?])\s+", cleaned)
-    return [part.strip() for part in parts if part.strip()]
+    claims: list[str] = []
+    for part in parts:
+        claim = part.strip()
+        if not claim:
+            continue
+        if re.fullmatch(r"(?:\[\d+\]\s*)+", claim):
+            if claims:
+                claims[-1] = f"{claims[-1]} {claim}".strip()
+            continue
+        claims.append(claim)
+    return claims
 
 
 def _context_texts(contexts: Sequence[str | RetrievedChunk]) -> list[str]:

@@ -10,6 +10,8 @@ pypdf>=4.2.0
 openai>=1.30.0
 requests>=2.32.0
 streamlit>=1.35.0
+fastapi>=0.111.0
+uvicorn>=0.30.0
 pytest>=8.2.0
 
 # Optional evaluation and hallucination-detection integrations.

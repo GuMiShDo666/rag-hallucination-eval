@@ -1,4 +1,4 @@
-from src.hallucination_detector import HallucinationDetector, parse_judge_response
+from src.hallucination_detector import HallucinationDetector, parse_judge_response, split_into_claims
 
 
 def test_detects_supported_claim_with_local_fallback():
@@ -50,3 +50,9 @@ def test_parse_judge_response_falls_back_to_unclear():
     assert result.final_judgement == "unsupported"
     assert result.hallucination_rate == 0.0
     assert result.spans[0].status == "unclear"
+
+
+def test_split_into_claims_keeps_citation_with_previous_sentence():
+    claims = split_into_claims("LoRA reduces trainable parameters. [1]")
+
+    assert claims == ["LoRA reduces trainable parameters. [1]"]

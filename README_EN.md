@@ -34,6 +34,8 @@ The default provider is Qwen through an OpenAI-compatible API. OpenAI, DeepSeek,
 
 ```text
 rag-hallucination-eval/
+├── api/
+│   └── server.py
 ├── app/
 │   └── streamlit_app.py
 ├── data/
@@ -44,6 +46,9 @@ rag-hallucination-eval/
 │   │   └── ragbench_covidqa_1000.json
 │   ├── imported/
 │   └── processed/
+├── docs/
+│   ├── api.md
+│   └── datasets.md
 ├── experiments/
 │   ├── run_baseline.py
 │   ├── run_ablation.py
@@ -181,6 +186,34 @@ streamlit run app/streamlit_app.py
 ```
 
 Open `http://localhost:8501`, click `Build Index`, ask a question, and inspect the answer, retrieved contexts, unsupported spans, and metrics.
+
+Start the hallucination detection API:
+
+```bash
+uvicorn api.server:app --host 0.0.0.0 --port 8000
+```
+
+Open the API docs:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Evaluate output from an external RAG system:
+
+```bash
+curl -s http://127.0.0.1:8000/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What problem does LoRA solve?",
+    "answer": "LoRA reduces trainable parameters by injecting low-rank matrices. [1]",
+    "contexts": [
+      "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
+    ],
+    "reference_answer": "LoRA reduces trainable parameters during fine-tuning.",
+    "gold_context": "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
+  }'
+```
 
 Import an external evaluation dataset:
 
