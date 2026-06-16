@@ -172,6 +172,14 @@ python experiments/run_ablation.py
 python experiments/plot_results.py
 ```
 
+运行 1000 条本地 RAGBench 压测：
+
+```bash
+python experiments/run_large_rag_eval.py --limit 1000
+```
+
+压测报告见 [docs/large_rag_eval.md](docs/large_rag_eval.md)。
+
 导入外部评测集：
 
 ```bash

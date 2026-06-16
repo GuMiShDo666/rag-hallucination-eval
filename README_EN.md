@@ -172,6 +172,14 @@ Generate plots:
 python experiments/plot_results.py
 ```
 
+Run the 1000-row local RAGBench stress test:
+
+```bash
+python experiments/run_large_rag_eval.py --limit 1000
+```
+
+See [docs/large_rag_eval.md](docs/large_rag_eval.md) for the stress-test report.
+
 Import an external evaluation dataset:
 
 ```bash
