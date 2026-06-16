@@ -52,6 +52,7 @@ SOURCE_ALIASES = {
         "supporting_context_ids",
         "evidence_ids",
         "relevant_doc_ids",
+        "all_relevant_sentence_keys",
     ],
     "risk_type": [
         "risk_type",
@@ -139,7 +140,7 @@ def import_dataset(
 
 
 def load_rows(input_path: str) -> list[dict]:
-    """Load rows from JSON, JSONL, or CSV input."""
+    """Load rows from JSON, JSONL, CSV, or Parquet input."""
 
     path = Path(input_path)
     suffix = path.suffix.lower()
@@ -167,6 +168,14 @@ def load_rows(input_path: str) -> list[dict]:
         with path.open("r", encoding="utf-8", newline="") as file:
             return [dict(row) for row in csv.DictReader(file)]
 
+    if suffix == ".parquet":
+        try:
+            import pandas as pd
+        except ImportError as exc:
+            raise ImportError("Parquet import requires pandas and pyarrow.") from exc
+        dataframe = pd.read_parquet(path)
+        return dataframe.to_dict(orient="records")
+
     raise ValueError(f"Unsupported input format: {path.suffix}")
 
 
@@ -180,7 +189,7 @@ def normalize_row(row: dict, source: str) -> dict | None:
     reference_answer = _reference_answer(row, source)
     candidate_answer = _candidate_answer(row, source)
     gold_context = _context_text(row)
-    risk_type = _pick_text(row, SOURCE_ALIASES["risk_type"]) or SOURCE_DEFAULTS[source]["risk_type"]
+    risk_type = _source_risk_type(row, source)
     supporting_chunk_ids = _pick_list(row, SOURCE_ALIASES["supporting_chunk_ids"])
     expected_citations = _pick_list(row, ["expected_citations", "citations", "citation_ids"])
 
@@ -200,7 +209,23 @@ def normalize_row(row: dict, source: str) -> dict | None:
         item["expected_citations"] = expected_citations
     if "id" in row:
         item["source_id"] = str(row["id"])
+    if "dataset_name" in row:
+        item["source_name"] = str(row["dataset_name"])
     return item
+
+
+def _source_risk_type(row: dict, source: str) -> str:
+    explicit = _pick_text(row, SOURCE_ALIASES["risk_type"])
+    if explicit:
+        return explicit
+    if source == "ragbench":
+        unsupported = _pick_list(row, ["unsupported_response_sentence_keys"])
+        if unsupported:
+            return "unsupported"
+        adherence = _pick_value(row, ["adherence_score"])
+        if isinstance(adherence, bool):
+            return "supported" if adherence else "unsupported"
+    return SOURCE_DEFAULTS[source]["risk_type"]
 
 
 def _reference_answer(row: dict, source: str) -> str:
@@ -237,6 +262,8 @@ def _pick_list(row: dict, keys: Iterable[str]) -> list[str]:
     value = _pick_value(row, keys)
     if value is None:
         return []
+    if _is_array_like(value):
+        value = value.tolist()
     if isinstance(value, list):
         return [str(item) for item in value if str(item).strip()]
     if isinstance(value, str):
@@ -259,12 +286,32 @@ def _pick_value(row: dict, keys: Iterable[str]) -> Any:
         original_key = lowered.get(key.lower())
         if original_key is not None:
             value = row[original_key]
-            if value is not None and value != "":
+            if not _is_empty_value(value):
                 return value
     return None
 
 
+def _is_empty_value(value: Any) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, str):
+        return value == ""
+    if isinstance(value, (list, tuple)) or _is_array_like(value):
+        return len(value) == 0
+    try:
+        import pandas as pd
+
+        missing = pd.isna(value)
+        if isinstance(missing, bool) and missing:
+            return True
+    except (ImportError, TypeError, ValueError):
+        pass
+    return False
+
+
 def _stringify_context(value: Any) -> str:
+    if _is_array_like(value):
+        value = value.tolist()
     if isinstance(value, str):
         stripped = value.strip()
         if stripped.startswith("[") or stripped.startswith("{"):
@@ -283,6 +330,10 @@ def _stringify_context(value: Any) -> str:
                 return _stringify_context(value[key])
         return json.dumps(value, ensure_ascii=False, sort_keys=True)
     return str(value)
+
+
+def _is_array_like(value: Any) -> bool:
+    return hasattr(value, "tolist") and not isinstance(value, (str, bytes, dict))
 
 
 def _coerce_dict(value: Any) -> dict:

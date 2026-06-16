@@ -38,6 +38,7 @@ rag-hallucination-eval/
 │   └── streamlit_app.py              # Streamlit demo
 ├── data/
 │   ├── eval_set.json                 # 示例评测集
+│   ├── eval_set_1000.json            # RAGBench covidqa/train 1000 条评测集
 │   ├── processed/                    # FAISS 索引输出目录
 │   └── raw_docs/
 │       └── sample_llm_notes.md       # 示例知识库文档
@@ -191,6 +192,18 @@ python scripts/import_datasets.py \
 ```
 
 支持 `ragtruth`、`ragbench`、`halueval`、`generic` 四种导入 profile，详见 [docs/datasets.md](docs/datasets.md)。
+
+生成 1000 条 RAGBench 本地评测集：
+
+```bash
+python scripts/download_ragbench_sample.py \
+  --subset covidqa \
+  --split train \
+  --limit 1000 \
+  --output data/eval_set_1000.json
+```
+
+当前仓库已包含 `data/eval_set_1000.json`，来源为 RAGBench `covidqa/train`，共 1000 条，其中 `supported` 858 条、`unsupported` 142 条。
 
 ### 运行结果展示
 

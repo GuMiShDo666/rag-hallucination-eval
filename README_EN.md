@@ -38,6 +38,7 @@ rag-hallucination-eval/
 │   └── streamlit_app.py
 ├── data/
 │   ├── eval_set.json
+│   ├── eval_set_1000.json
 │   ├── processed/
 │   └── raw_docs/
 │       └── sample_llm_notes.md
@@ -191,6 +192,18 @@ python scripts/import_datasets.py \
 ```
 
 Supported import profiles are `ragtruth`, `ragbench`, `halueval`, and `generic`. See [docs/datasets.md](docs/datasets.md).
+
+Generate a 1000-row local RAGBench eval set:
+
+```bash
+python scripts/download_ragbench_sample.py \
+  --subset covidqa \
+  --split train \
+  --limit 1000 \
+  --output data/eval_set_1000.json
+```
+
+The repository includes `data/eval_set_1000.json`, sourced from RAGBench `covidqa/train`. It contains 1000 rows: 858 `supported` rows and 142 `unsupported` rows.
 
 ### Run Results
 

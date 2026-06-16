@@ -13,7 +13,7 @@ def test_import_ragbench_jsonl_fixture():
             "reference_answer": "RAG grounds answers in retrieved documents.",
             "gold_context": "RAG combines retrieval with generation to ground answers in external documents.",
             "answerable": True,
-            "risk_type": "grounded",
+            "risk_type": "supported",
             "source_dataset": "ragbench",
             "candidate_answer": "RAG grounds answers in retrieved documents.",
             "source_id": "rb-1",

@@ -29,10 +29,11 @@ Required fields for the current evaluator:
 | `candidate_answer` | no | Pre-generated answer from hallucination datasets |
 | `supporting_chunk_ids` | no | Gold evidence IDs if available |
 | `expected_citations` | no | Gold citation IDs if available |
+| `source_name` | no | Original subset/split name if available |
 
 ## Import Commands
 
-The importer accepts `.json`, `.jsonl`, and `.csv` files:
+The importer accepts `.json`, `.jsonl`, `.csv`, and `.parquet` files:
 
 ```bash
 python scripts/import_datasets.py \
@@ -79,8 +80,38 @@ Use `--append` to add rows to an existing imported JSON file.
 | Source | Input purpose | Common fields handled |
 |---|---|---|
 | `ragtruth` | RAG hallucination annotations | `query`, `response`, `source_info`, `hallucination_type` |
-| `ragbench` | RAG groundedness and faithfulness data | `question`, `response`, `documents`, `label` |
+| `ragbench` | RAG groundedness and faithfulness data | `question`, `response`, `documents`, `adherence_score`, `unsupported_response_sentence_keys` |
 | `halueval` | Right answer vs hallucinated answer pairs | `question`, `right_answer`, `hallucinated_answer`, `knowledge` |
 | `generic` | Custom local datasets | `question`, `reference_answer`, `gold_context`, `contexts` |
 
 Imported files are written under `data/imported/` by default.
+
+## Build a 1000-Row Local Eval Set
+
+RAGBench is published as `galileo-ai/ragbench` on Hugging Face under `cc-by-4.0`. The helper below downloads the `covidqa/train` parquet split and writes the first 1000 normalized rows to `data/eval_set_1000.json`:
+
+```bash
+python scripts/download_ragbench_sample.py \
+  --subset covidqa \
+  --split train \
+  --limit 1000 \
+  --output data/eval_set_1000.json
+```
+
+The checked-in `data/eval_set_1000.json` file was generated from RAGBench `covidqa/train` and contains:
+
+| Field | Value |
+|---|---:|
+| rows | 1000 |
+| supported | 858 |
+| unsupported | 142 |
+| rows with `gold_context` | 1000 |
+| rows with `supporting_chunk_ids` | 979 |
+
+Use it with the baseline runner:
+
+```bash
+MOCK_LLM=true python experiments/run_baseline.py \
+  --eval data/eval_set_1000.json \
+  --output results/baseline_1000_results.csv
+```
