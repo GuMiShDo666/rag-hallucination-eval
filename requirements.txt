@@ -1,0 +1,17 @@
+python-dotenv>=1.0.1
+pydantic>=2.7.0
+numpy>=1.26.0
+pandas>=2.2.0
+matplotlib>=3.8.0
+sentence-transformers>=2.7.0
+faiss-cpu>=1.8.0
+pypdf>=4.2.0
+openai>=1.30.0
+requests>=2.32.0
+streamlit>=1.35.0
+pytest>=8.2.0
+
+# Optional evaluation and hallucination-detection integrations.
+# The project will provide fallback implementations if these are unavailable.
+ragas>=0.1.9
+deepeval>=0.21.0

@@ -1,0 +1,27 @@
+[
+  {
+    "question": "What problem does LoRA solve?",
+    "reference_answer": "LoRA reduces the number of trainable parameters for fine-tuning large language models.",
+    "gold_context": "LoRA reduces the number of trainable parameters by injecting low-rank matrices into model weights."
+  },
+  {
+    "question": "Why is RAG used in question answering?",
+    "reference_answer": "RAG retrieves external knowledge and conditions generation on the retrieved context.",
+    "gold_context": "RAG combines retrieval with generation to ground answers in external documents."
+  },
+  {
+    "question": "What mechanism do Transformers use to model token relationships?",
+    "reference_answer": "Transformers use self-attention to model relationships between tokens.",
+    "gold_context": "Transformers are neural network architectures that use self-attention to model relationships between tokens in a sequence."
+  },
+  {
+    "question": "Does RAG automatically guarantee factual correctness?",
+    "reference_answer": "No. RAG can still produce unsupported claims if retrieval is incomplete, irrelevant, or ignored.",
+    "gold_context": "RAG does not automatically guarantee factual correctness."
+  },
+  {
+    "question": "How does LoRA make fine-tuning cheaper?",
+    "reference_answer": "LoRA trains small low-rank adapter matrices instead of updating every model parameter.",
+    "gold_context": "Instead of updating every parameter in a large model, LoRA trains small adapter matrices, which makes fine-tuning cheaper and easier to store."
+  }
+]
