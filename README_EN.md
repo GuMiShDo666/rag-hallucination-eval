@@ -212,8 +212,10 @@ curl -s http://127.0.0.1:8000/evaluate \
     ],
     "reference_answer": "LoRA reduces trainable parameters during fine-tuning.",
     "gold_context": "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
-  }'
+}'
 ```
+
+Use `POST /batch_evaluate` for batch external RAG outputs. See [docs/api.md](docs/api.md).
 
 Import an external evaluation dataset:
 

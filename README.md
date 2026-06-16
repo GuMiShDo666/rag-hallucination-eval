@@ -212,8 +212,10 @@ curl -s http://127.0.0.1:8000/evaluate \
     ],
     "reference_answer": "LoRA reduces trainable parameters during fine-tuning.",
     "gold_context": "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
-  }'
+}'
 ```
+
+批量检测外部 RAG 输出使用 `POST /batch_evaluate`，详见 [docs/api.md](docs/api.md)。
 
 导入外部评测集：
 

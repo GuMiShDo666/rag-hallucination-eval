@@ -24,8 +24,15 @@ class DetectRequest(BaseModel):
 class EvaluateRequest(DetectRequest):
     """Request body for detection plus metric calculation."""
 
+    id: str | None = None
     reference_answer: str | None = None
     gold_context: str | None = None
+
+
+class BatchEvaluateRequest(BaseModel):
+    """Request body for batch external RAG evaluation."""
+
+    items: list[EvaluateRequest] = Field(..., min_length=1)
 
 
 class SpanResponse(BaseModel):
@@ -49,10 +56,33 @@ class DetectResponse(BaseModel):
 class EvaluateResponse(DetectResponse):
     """Detection response with fallback evaluation metrics."""
 
+    id: str | None = None
+    question: str
     faithfulness: float | None
     answer_relevancy: float | None
     context_precision: float | None
     citation_accuracy: float | None
+
+
+class BatchSummary(BaseModel):
+    """Aggregate metrics for a batch evaluation response."""
+
+    total: int
+    supported: int
+    partially_supported: int
+    unsupported: int
+    avg_hallucination_rate: float | None
+    avg_faithfulness: float | None
+    avg_answer_relevancy: float | None
+    avg_context_precision: float | None
+    avg_citation_accuracy: float | None
+
+
+class BatchEvaluateResponse(BaseModel):
+    """Batch evaluation response."""
+
+    summary: BatchSummary
+    results: list[EvaluateResponse]
 
 
 app = FastAPI(
@@ -86,6 +116,21 @@ def detect(request: DetectRequest) -> DetectResponse:
 def evaluate(request: EvaluateRequest) -> EvaluateResponse:
     """Detect hallucinations and compute fallback evaluation metrics."""
 
+    return _evaluate_item(request)
+
+
+@app.post("/batch_evaluate", response_model=BatchEvaluateResponse)
+def batch_evaluate(request: BatchEvaluateRequest) -> BatchEvaluateResponse:
+    """Evaluate multiple external RAG outputs in one request."""
+
+    results = [_evaluate_item(item) for item in request.items]
+    return BatchEvaluateResponse(
+        summary=_batch_summary(results),
+        results=results,
+    )
+
+
+def _evaluate_item(request: EvaluateRequest) -> EvaluateResponse:
     detector = _detector(use_llm_judge=request.use_llm_judge)
     evaluator = RAGEvaluator(detector=detector)
     result = evaluator.evaluate_single(
@@ -103,11 +148,35 @@ def evaluate(request: EvaluateRequest) -> EvaluateResponse:
     response = _detect_response(detection)
     return EvaluateResponse(
         **response.model_dump(),
+        id=request.id,
+        question=request.question,
         faithfulness=result.faithfulness,
         answer_relevancy=result.answer_relevancy,
         context_precision=result.context_precision,
         citation_accuracy=result.citation_accuracy,
     )
+
+
+def _batch_summary(results: list[EvaluateResponse]) -> BatchSummary:
+    judgements = [result.final_judgement for result in results]
+    return BatchSummary(
+        total=len(results),
+        supported=judgements.count("supported"),
+        partially_supported=judgements.count("partially_supported"),
+        unsupported=judgements.count("unsupported"),
+        avg_hallucination_rate=_mean([result.hallucination_rate for result in results]),
+        avg_faithfulness=_mean([result.faithfulness for result in results]),
+        avg_answer_relevancy=_mean([result.answer_relevancy for result in results]),
+        avg_context_precision=_mean([result.context_precision for result in results]),
+        avg_citation_accuracy=_mean([result.citation_accuracy for result in results]),
+    )
+
+
+def _mean(values: list[float | None]) -> float | None:
+    numeric_values = [value for value in values if value is not None]
+    if not numeric_values:
+        return None
+    return sum(numeric_values) / len(numeric_values)
 
 
 @lru_cache(maxsize=2)

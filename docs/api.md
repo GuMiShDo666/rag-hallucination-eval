@@ -19,6 +19,7 @@ http://127.0.0.1:8000/docs
 | `GET` | `/health` | Health check |
 | `POST` | `/detect` | Claim-level hallucination detection |
 | `POST` | `/evaluate` | Detection plus fallback metrics |
+| `POST` | `/batch_evaluate` | Batch evaluation for external RAG outputs |
 
 ## Detect
 
@@ -84,3 +85,55 @@ Response adds:
 ```
 
 Set `use_llm_judge` to `true` in the request body to use Qwen as the judge when `QWEN_API_KEY` is configured.
+
+## Batch Evaluate
+
+Request:
+
+```bash
+curl -s http://127.0.0.1:8000/batch_evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {
+        "id": "case-1",
+        "question": "What problem does LoRA solve?",
+        "answer": "LoRA reduces trainable parameters. [1]",
+        "contexts": [
+          "LoRA reduces trainable parameters during fine-tuning."
+        ],
+        "reference_answer": "LoRA reduces trainable parameters.",
+        "gold_context": "LoRA reduces trainable parameters during fine-tuning."
+      },
+      {
+        "id": "case-2",
+        "question": "What problem does LoRA solve?",
+        "answer": "The Amazon rainforest is home to many species.",
+        "contexts": [
+          "LoRA reduces trainable parameters during fine-tuning."
+        ],
+        "reference_answer": "LoRA reduces trainable parameters.",
+        "gold_context": "LoRA reduces trainable parameters during fine-tuning."
+      }
+    ]
+  }'
+```
+
+Response:
+
+```json
+{
+  "summary": {
+    "total": 2,
+    "supported": 1,
+    "partially_supported": 0,
+    "unsupported": 1,
+    "avg_hallucination_rate": 0.5,
+    "avg_faithfulness": 0.5,
+    "avg_answer_relevancy": 0.5,
+    "avg_context_precision": 1.0,
+    "avg_citation_accuracy": 1.0
+  },
+  "results": []
+}
+```
