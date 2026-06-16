@@ -111,12 +111,13 @@ def _plot_query_rewrite_comparison(dataframe: pd.DataFrame, output_dir: Path) ->
 def _bar_plot(labels: list[str], values, title: str, xlabel: str, ylabel: str, output_path: Path) -> None:
     fig, ax = plt.subplots(figsize=(7, 4.5))
     numeric_values = [0.0 if pd.isna(value) else float(value) for value in values]
-    ax.bar(labels, numeric_values, color="#4C78A8")
+    bars = ax.bar(labels, numeric_values, color="#4C78A8")
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, max(1.0, max(numeric_values, default=0.0) * 1.15))
     ax.grid(axis="y", alpha=0.25)
+    _annotate_bars(ax, bars, numeric_values)
     fig.tight_layout()
     fig.savefig(output_path, dpi=160)
     plt.close(fig)
@@ -125,14 +126,30 @@ def _bar_plot(labels: list[str], values, title: str, xlabel: str, ylabel: str, o
 def _grouped_metric_plot(labels: list[str], values: list[float | None], title: str, ylabel: str, output_path: Path) -> None:
     fig, ax = plt.subplots(figsize=(6.5, 4.5))
     numeric_values = [0.0 if value is None or pd.isna(value) else float(value) for value in values]
-    ax.bar(labels, numeric_values, color=["#4C78A8", "#F58518"])
+    bars = ax.bar(labels, numeric_values, color=["#4C78A8", "#F58518"])
     ax.set_title(title)
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, max(1.0, max(numeric_values, default=0.0) * 1.15))
     ax.grid(axis="y", alpha=0.25)
+    _annotate_bars(ax, bars, numeric_values)
     fig.tight_layout()
     fig.savefig(output_path, dpi=160)
     plt.close(fig)
+
+
+def _annotate_bars(ax, bars, values: list[float]) -> None:
+    """Label bars so zero-valued metrics do not look like missing data."""
+
+    for bar, value in zip(bars, values, strict=False):
+        y = value if value > 0 else 0.015
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            y,
+            f"{value:.3f}",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+        )
 
 
 def _first_metric(dataframe: pd.DataFrame, column: str, expected_value: bool, metric: str) -> float | None:
