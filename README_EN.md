@@ -1,103 +1,48 @@
-# RAG Hallucination Eval
+<h1 align="center">RAG Hallucination Eval</h1>
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)
-![RAG](https://img.shields.io/badge/RAG-Evaluation-0F766E?style=flat)
-![FAISS](https://img.shields.io/badge/Vector%20Search-FAISS-2563EB?style=flat)
-![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-pytest-0A7F3F?style=flat)
+<p align="center">
+  <strong>Local-first hallucination detection and batch evaluation for RAG systems</strong>
+  <br />
+  <em>Claim-level detection · External RAG evaluation · Qwen-compatible API · Reproducible experiments</em>
+</p>
 
-> A local-first RAG evaluation project for detecting unsupported claims in generated answers.
->
-> [中文 README](README.md)
+<p align="center">
+  <a href="#quick-start"><img src="https://img.shields.io/badge/Quick_Start-Run_Local-2563EB?style=for-the-badge" alt="Quick Start" /></a>
+  <a href="#minimal-api-example"><img src="https://img.shields.io/badge/API-FastAPI-009688?style=for-the-badge" alt="FastAPI API" /></a>
+  <a href="#results"><img src="https://img.shields.io/badge/Results-Evaluation-7C3AED?style=for-the-badge" alt="Results" /></a>
+</p>
 
-### Overview
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/RAG-Evaluation-0F766E?style=flat-square" alt="RAG Evaluation" />
+  <img src="https://img.shields.io/badge/Vector_Search-FAISS-2563EB?style=flat-square" alt="FAISS" />
+  <img src="https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit" />
+  <img src="https://img.shields.io/badge/tests-pytest-0A7F3F?style=flat-square" alt="pytest" />
+</p>
 
-RAG Hallucination Eval is a local-first evaluation project for retrieval-augmented generation systems. It builds a vector index from local documents, retrieves relevant context for a user question, asks an LLM to generate a citation-aware answer, and then checks whether each answer claim is supported by the retrieved context.
+<p align="center">
+  <a href="README.md">中文</a> ·
+  <a href="docs/api.md">API Docs</a> ·
+  <a href="docs/datasets.md">Dataset Docs</a> ·
+  <a href="docs/external_ragflow_eval.md">External RAG Test</a>
+</p>
 
-The default provider is Qwen through an OpenAI-compatible API. OpenAI, DeepSeek, and mock execution are also supported. The project can still run without an API key or downloadable embedding model by using mock LLM output and deterministic hashing embeddings.
+---
 
-### Features
+RAG Hallucination Eval checks whether generated RAG answers are supported by their retrieved contexts. It can run as a built-in demo pipeline, or as a standalone API that evaluates outputs from any external RAG system through the stable `question + answer + contexts` contract.
 
-| Area | Description |
+## Key Features
+
+| Feature | Description |
 |---|---|
-| Document loading | Reads `.txt`, `.md`, and `.pdf` files into internal `Document` objects |
-| Chunking | Splits text with configurable chunk size and overlap while preserving metadata |
-| Retrieval | Uses `BAAI/bge-small-en-v1.5` by default and falls back to hashing embeddings |
-| Generation | Uses a context-grounded prompt and citation-style references such as `[1]` |
-| Hallucination detection | Labels claims as `supported`, `unsupported`, `contradicted`, or `unclear` |
-| Evaluation | Reports faithfulness, answer relevancy, context precision, citation accuracy, and hallucination rate |
-| Query rewriting | Uses the active LLM provider to rewrite questions into retrieval-oriented queries |
-| Experiments | Includes baseline runs, chunk/top-k/query rewrite ablations, and Matplotlib plots |
-| Demo | Provides a Streamlit interface for indexing, asking questions, and inspecting metrics |
+| Built-in RAG pipeline | Loads `.txt`, `.md`, and `.pdf`, chunks text, builds a FAISS index, and generates answers |
+| External RAG evaluation | Evaluates outputs from other RAG systems without requiring them to use this retrieval stack |
+| Claim-level detection | Labels answer spans as `supported`, `unsupported`, `contradicted`, or `unclear` |
+| Batch API | `/batch_evaluate` accepts multiple samples for offline evaluation or regression tests |
+| Reproducible experiments | Includes baseline, chunk size, top-k, query rewrite, and reranker-switch experiments |
+| Offline runnable | Falls back to mock LLM output and hashing embeddings when API keys or embedding downloads are unavailable |
 
-### Directory Layout
-
-```text
-rag-hallucination-eval/
-├── api/
-│   └── server.py
-├── app/
-│   └── streamlit_app.py
-├── data/
-│   ├── documents/
-│   │   └── sample_llm_notes.md
-│   ├── eval_sets/
-│   │   ├── sample.json
-│   │   └── ragbench_covidqa_1000.json
-│   ├── imported/
-│   └── processed/
-├── docs/
-│   ├── api.md
-│   └── datasets.md
-├── experiments/
-│   ├── run_baseline.py
-│   ├── run_ablation.py
-│   └── plot_results.py
-├── src/
-│   ├── config.py
-│   ├── document_loader.py
-│   ├── chunker.py
-│   ├── embedder.py
-│   ├── retriever.py
-│   ├── generator.py
-│   ├── hallucination_detector.py
-│   ├── evaluator.py
-│   └── pipeline.py
-├── tests/
-├── .env.example
-├── requirements.txt
-├── README_EN.md
-└── README.md
-```
-
-### Architecture
-
-![RAG Hallucination Eval Architecture](docs/assets/architecture.svg)
-
-### How It Works
-
-1. **Document normalization**  
-   `src/document_loader.py` converts source files into `Document` objects. PDF files are parsed by page, and source metadata is retained.
-
-2. **Chunking with traceability**  
-   `src/chunker.py` creates overlapping chunks while carrying `source`, `page`, and `chunk_id` metadata forward.
-
-3. **Vector retrieval**  
-   `src/embedder.py` tries sentence-transformers first. If that fails, deterministic hashing embeddings keep tests and demos runnable. `src/retriever.py` stores and searches vectors with FAISS.
-
-4. **Context-grounded generation**  
-   `src/generator.py` builds a fixed prompt that instructs the model to answer only from retrieved context and to report insufficient context when needed. Qwen calls use the DashScope OpenAI-compatible endpoint.
-
-5. **Query rewriting**  
-   `src/query_rewriter.py` calls the active LLM provider when `use_query_rewrite=True` and rewrites the natural-language question into a shorter retrieval query. Mock mode or missing provider keys fall back to the original question.
-
-6. **Claim-level detection**  
-   `src/hallucination_detector.py` checks smaller answer spans against retrieved context and returns support labels.
-
-7. **Metric calculation**  
-   `src/evaluator.py` computes faithfulness, answer relevancy, context precision, citation accuracy, and hallucination rate. The fallback evaluator uses lexical overlap for reproducible local runs.
-
-### Quick Start
+## Quick Start
 
 ```bash
 python3 -m venv .venv
@@ -107,7 +52,74 @@ cp .env.example .env
 python -m pytest
 ```
 
-### Configuration
+Start the Streamlit demo:
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+Start the API server:
+
+```bash
+uvicorn api.server:app --host 0.0.0.0 --port 8000
+```
+
+Open the interactive API docs:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+## Minimal API Example
+
+Evaluate one external RAG answer:
+
+```bash
+curl -s http://127.0.0.1:8000/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What problem does LoRA solve?",
+    "answer": "LoRA reduces trainable parameters by injecting low-rank matrices. [1]",
+    "contexts": [
+      "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
+    ],
+    "reference_answer": "LoRA reduces trainable parameters during fine-tuning.",
+    "gold_context": "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
+}'
+```
+
+Common endpoints:
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/health` | GET | Service health check |
+| `/detect` | POST | Claim-level hallucination detection only |
+| `/evaluate` | POST | Single-sample detection and metrics |
+| `/batch_evaluate` | POST | Batch evaluation for external RAG outputs |
+
+See [docs/api.md](docs/api.md).
+
+## Architecture
+
+![RAG Hallucination Eval Architecture](docs/assets/architecture.svg)
+
+The built-in demo and external RAG outputs both flow into the same detection core. The stable input contract is:
+
+```text
+question + answer + contexts
+```
+
+Core pipeline:
+
+1. `src/document_loader.py` normalizes source files into `Document` objects.
+2. `src/chunker.py` creates chunks and carries `source`, `page`, and `chunk_id` metadata.
+3. `src/embedder.py` tries sentence-transformers first and falls back to hashing embeddings.
+4. `src/retriever.py` performs top-k retrieval with FAISS.
+5. `src/generator.py` produces context-grounded answers through a fixed prompt.
+6. `src/hallucination_detector.py` performs claim-level support detection.
+7. `src/evaluator.py` computes faithfulness, answer relevancy, context precision, citation accuracy, and hallucination rate.
+
+## Configuration
 
 Edit `.env`:
 
@@ -123,9 +135,9 @@ Edit `.env`:
 | `DEFAULT_CHUNK_SIZE` | `512` | Default chunk size |
 | `DEFAULT_CHUNK_OVERLAP` | `80` | Default chunk overlap |
 | `DEFAULT_TOP_K` | `5` | Default retrieval depth |
-| `MOCK_LLM` | `false` | Set to `true` for local runs without real API calls |
+| `MOCK_LLM` | `false` | Set to `true` to avoid real LLM API calls |
 
-Qwen configuration:
+Qwen example:
 
 ```bash
 LLM_PROVIDER=qwen
@@ -134,13 +146,13 @@ QWEN_MODEL=qwen-plus
 MOCK_LLM=false
 ```
 
-Local-only configuration:
+Local-only mode:
 
 ```bash
 MOCK_LLM=true
 ```
 
-### Usage
+## Experiments and Datasets
 
 Run the baseline:
 
@@ -160,46 +172,6 @@ Generate plots:
 python experiments/plot_results.py
 ```
 
-Start the Streamlit demo:
-
-```bash
-streamlit run app/streamlit_app.py
-```
-
-Open `http://localhost:8501`, click `Build Index`, ask a question, and inspect the answer, retrieved contexts, unsupported spans, and metrics.
-
-Start the hallucination detection API:
-
-```bash
-uvicorn api.server:app --host 0.0.0.0 --port 8000
-```
-
-Open the API docs:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-Evaluate output from an external RAG system:
-
-```bash
-curl -s http://127.0.0.1:8000/evaluate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "question": "What problem does LoRA solve?",
-    "answer": "LoRA reduces trainable parameters by injecting low-rank matrices. [1]",
-    "contexts": [
-      "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
-    ],
-    "reference_answer": "LoRA reduces trainable parameters during fine-tuning.",
-    "gold_context": "LoRA reduces trainable parameters by injecting low-rank matrices into model weights."
-}'
-```
-
-Use `POST /batch_evaluate` for batch external RAG outputs. See [docs/api.md](docs/api.md).
-
-External open-source RAG smoke test results are documented in [docs/external_ragflow_eval.md](docs/external_ragflow_eval.md).
-
 Import an external evaluation dataset:
 
 ```bash
@@ -213,19 +185,9 @@ python scripts/import_datasets.py \
 
 Supported import profiles are `ragtruth`, `ragbench`, `halueval`, and `generic`. See [docs/datasets.md](docs/datasets.md).
 
-Generate a 1000-row local RAGBench eval set:
+This repository includes `data/eval_sets/ragbench_covidqa_1000.json`, sourced from RAGBench `covidqa/train`. It contains 1000 rows: 858 `supported` rows and 142 `unsupported` rows.
 
-```bash
-python scripts/download_ragbench_sample.py \
-  --subset covidqa \
-  --split train \
-  --limit 1000 \
-  --output data/eval_sets/ragbench_covidqa_1000.json
-```
-
-The repository includes `data/eval_sets/ragbench_covidqa_1000.json`, sourced from RAGBench `covidqa/train`. It contains 1000 rows: 858 `supported` rows and 142 `unsupported` rows.
-
-### Run Results
+## Results
 
 Baseline output:
 
@@ -246,32 +208,6 @@ Baseline metrics:
 | avg_answer_relevancy | 0.3919 |
 | avg_context_precision | 0.4000 |
 | avg_hallucination_rate | 0.0000 |
-
-Ablation output:
-
-```text
-[1/10] Running chunk_size_256
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[2/10] Running chunk_size_512
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[3/10] Running chunk_size_1024
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[4/10] Running top_k_3
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[5/10] Running top_k_5
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[6/10] Running top_k_8
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[7/10] Running query_rewrite_false
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[8/10] Running query_rewrite_true
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[9/10] Running reranker_false
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[10/10] Running reranker_true
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-Saved 10 ablation rows to results/ablation_results.csv
-```
 
 Ablation summary:
 
@@ -294,7 +230,27 @@ Generated plots:
 
 ![Baseline vs Query Rewrite](docs/assets/baseline_vs_query_rewrite.png)
 
-### Outputs
+## Directory Layout
+
+```text
+rag-hallucination-eval/
+├── api/                         # FastAPI service
+├── app/                         # Streamlit Web Demo
+├── data/
+│   ├── documents/               # Sample knowledge-base documents
+│   ├── eval_sets/               # Evaluation datasets
+│   ├── imported/                # Local import cache
+│   └── processed/               # FAISS index outputs
+├── docs/                        # API, dataset, and external test docs
+├── experiments/                 # Baseline, ablation, and plotting scripts
+├── scripts/                     # Dataset download and import scripts
+├── src/                         # Core RAG and hallucination detection modules
+├── tests/                       # pytest tests
+├── README.md
+└── README_EN.md
+```
+
+## Outputs
 
 | Path | Description |
 |---|---|
@@ -304,18 +260,18 @@ Generated plots:
 | `results/figures/` | Generated Matplotlib figures |
 | `data/processed/faiss_index*` | Local FAISS index files |
 
-### Validation
+## Validation
 
 Latest local test run:
 
 ```text
-19 passed, 1 warning
+32 passed, 2 warnings
 ```
 
-### Limitations
+## Limitations
 
-- The reranker switch is still a placeholder for future implementation.
+- The reranker switch is currently a placeholder for a future reranking strategy.
 - Query rewriting uses the configured LLM provider and falls back to the original question in mock mode or when provider keys are missing.
 - The fallback evaluator uses lexical overlap and is not a high-precision semantic judge.
 - Ragas, DeepEval, and LettuceDetect are not required by the stable local workflow.
-- No `LICENSE` file is currently included. Add one before treating the repository as formally open source.
+- No `LICENSE` file is currently included.

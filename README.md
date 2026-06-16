@@ -1,103 +1,48 @@
-# RAG Hallucination Eval
+<h1 align="center">RAG Hallucination Eval</h1>
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)
-![RAG](https://img.shields.io/badge/RAG-Evaluation-0F766E?style=flat)
-![FAISS](https://img.shields.io/badge/Vector%20Search-FAISS-2563EB?style=flat)
-![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-pytest-0A7F3F?style=flat)
+<p align="center">
+  <strong>面向 RAG 系统的本地优先幻觉检测与批量评测工具</strong>
+  <br />
+  <em>Claim-level detection · External RAG evaluation · Qwen-compatible API · Reproducible experiments</em>
+</p>
 
-> 面向 RAG 问答系统的本地优先幻觉检测与评测项目。
->
-> [English README](README_EN.md)
+<p align="center">
+  <a href="#快速开始"><img src="https://img.shields.io/badge/Quick_Start-Run_Local-2563EB?style=for-the-badge" alt="Quick Start" /></a>
+  <a href="#最小-api-示例"><img src="https://img.shields.io/badge/API-FastAPI-009688?style=for-the-badge" alt="FastAPI API" /></a>
+  <a href="#运行结果展示"><img src="https://img.shields.io/badge/Results-Evaluation-7C3AED?style=for-the-badge" alt="Results" /></a>
+</p>
 
-### 项目简介
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/RAG-Evaluation-0F766E?style=flat-square" alt="RAG Evaluation" />
+  <img src="https://img.shields.io/badge/Vector_Search-FAISS-2563EB?style=flat-square" alt="FAISS" />
+  <img src="https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit" />
+  <img src="https://img.shields.io/badge/tests-pytest-0A7F3F?style=flat-square" alt="pytest" />
+</p>
 
-RAG Hallucination Eval 是一个面向 RAG 问答系统的幻觉检测与评测项目。它先对本地文档建立向量索引，再根据用户问题检索相关上下文，调用 LLM 生成带引用的答案，最后把答案拆成 claim/sentence 级片段，判断每个片段是否被检索上下文支持。
+<p align="center">
+  <a href="README_EN.md">English</a> ·
+  <a href="docs/api.md">API 文档</a> ·
+  <a href="docs/datasets.md">数据集文档</a> ·
+  <a href="docs/external_ragflow_eval.md">外部 RAG 测试</a>
+</p>
 
-项目默认支持 Qwen 的 OpenAI-compatible API，也保留 OpenAI、DeepSeek 和 mock 模式。即使没有 API Key，或本地无法下载 Hugging Face embedding 模型，也可以通过 mock LLM 与 deterministic hashing embedding 跑通完整流程。
+---
 
-### 核心功能
+RAG Hallucination Eval 用来检查 RAG 问答结果中哪些陈述被上下文支持、哪些可能是幻觉。它既可以运行一个内置 RAG demo，也可以作为独立 API 接收其他 RAG 系统的 `question + answer + contexts`，输出 claim 级检测结果和评测指标。
 
-| 模块 | 说明 |
+## 核心能力
+
+| 能力 | 说明 |
 |---|---|
-| 文档加载 | 读取 `.txt`、`.md`、`.pdf`，统一转换为内部 `Document` 对象 |
-| 文本切分 | 按 chunk size 与 overlap 切分文本，并保留 source、page、chunk_id |
-| 向量检索 | 默认使用 `BAAI/bge-small-en-v1.5`，失败时自动切换 hashing embedding |
-| 答案生成 | 使用严格 grounding prompt，要求答案只基于检索上下文并尽量带 `[1]` 引用 |
-| 幻觉检测 | 输出 `supported`、`unsupported`、`contradicted`、`unclear` 级别的判断 |
-| 自动评测 | 计算 faithfulness、answer relevancy、context precision、citation accuracy、hallucination rate |
-| 查询改写 | `use_query_rewrite` 开启后使用 LLM 将问题改写为更适合检索的 query |
-| 实验脚本 | 支持 baseline、chunk/top-k/query rewrite 消融实验和 Matplotlib 图表生成 |
-| Web Demo | Streamlit 页面可交互构建索引、提问、查看上下文和评测指标 |
+| 内置 RAG 流程 | 加载 `.txt`、`.md`、`.pdf`，切分 chunk，构建 FAISS 索引并生成答案 |
+| 外部 RAG 评测 | 直接检测其他 RAG 系统输出，不要求对方使用本项目的检索链路 |
+| Claim 级检测 | 将答案拆成可判断片段，标注 `supported`、`unsupported`、`contradicted`、`unclear` |
+| 批量评测 API | `/batch_evaluate` 支持一次提交多条样本，适合离线评测集或回归测试 |
+| 可复现实验 | 提供 baseline、chunk size、top-k、query rewrite、reranker 开关实验 |
+| 离线可跑 | 缺少 API key 或 embedding 模型不可用时，可通过 mock LLM 和 hashing embedding 跑通流程 |
 
-### 项目结构
-
-```text
-rag-hallucination-eval/
-├── api/
-│   └── server.py                     # FastAPI 幻觉检测服务
-├── app/
-│   └── streamlit_app.py              # Streamlit demo
-├── data/
-│   ├── documents/                    # 示例知识库文档
-│   │   └── sample_llm_notes.md
-│   ├── eval_sets/                    # 项目评测集
-│   │   ├── sample.json               # 5 条示例评测集
-│   │   └── ragbench_covidqa_1000.json # RAGBench covidqa/train 1000 条评测集
-│   ├── imported/                     # 本地导入和下载缓存
-│   └── processed/                    # FAISS 索引输出目录
-├── docs/
-│   ├── api.md                        # API 使用说明
-│   └── datasets.md                   # 数据集导入说明
-├── experiments/
-│   ├── run_baseline.py               # baseline 评测
-│   ├── run_ablation.py               # chunk/top-k 消融实验
-│   └── plot_results.py               # 结果图表生成
-├── src/
-│   ├── config.py                     # 环境变量与运行配置
-│   ├── document_loader.py            # txt/md/pdf 文档加载
-│   ├── chunker.py                    # chunk 切分逻辑
-│   ├── embedder.py                   # embedding 与 fallback
-│   ├── retriever.py                  # FAISS 检索器
-│   ├── generator.py                  # LLM 答案生成
-│   ├── hallucination_detector.py     # claim 级幻觉检测
-│   ├── evaluator.py                  # 自动评测指标
-│   └── pipeline.py                   # 端到端流程编排
-├── tests/                            # pytest 测试
-├── .env.example                      # 环境变量模板
-├── requirements.txt                  # Python 依赖
-├── README_EN.md                      # English documentation
-└── README.md
-```
-
-### 架构图
-
-![RAG Hallucination Eval Architecture](docs/assets/architecture.svg)
-
-### 底层原理
-
-1. **文档标准化**  
-   `src/document_loader.py` 把原始文档转换为统一的 `Document` 数据结构。PDF 会按页解析，文本类文件会保留来源路径，后续每个 chunk 都可以追溯到原始文档。
-
-2. **切分与元数据传递**  
-   `src/chunker.py` 使用固定窗口和 overlap 切分文本。chunk 不只是文本片段，还带有 `source`、`page`、`chunk_id` 等元数据，用于检索、引用和评测。
-
-3. **向量索引与 fallback**  
-   `src/embedder.py` 优先加载 sentence-transformers 模型。如果模型不可用，系统使用确定性的 hashing embedding，让测试和 demo 不依赖外部模型下载。`src/retriever.py` 使用 FAISS 做 top-k 相似度检索。
-
-4. **上下文约束生成**  
-   `src/generator.py` 构造固定 prompt，要求模型只使用检索上下文回答，信息不足时返回上下文不足。Qwen 通过 `https://dashscope.aliyuncs.com/compatible-mode/v1` 这个 OpenAI-compatible endpoint 调用。
-
-5. **查询改写**  
-   `src/query_rewriter.py` 在 `use_query_rewrite=True` 时调用当前 LLM provider，把自然语言问题改写为更适合向量检索的短 query。mock 模式或缺少 provider key 时会回退到原问题。
-
-6. **claim 级幻觉检测**  
-   `src/hallucination_detector.py` 把答案拆为更小的判断单元，再和检索上下文对齐。当前稳定路径包含本地 fallback 判断，同时预留 Qwen LLM-as-a-Judge 的入口。
-
-7. **指标计算**  
-   `src/evaluator.py` 基于答案、上下文和检测结果计算多个指标。fallback evaluator 主要使用 lexical overlap，适合本地可复现评测；若要更高语义精度，可以继续接入 Ragas、DeepEval 或专用 judge model。
-
-### 快速开始
+## 快速开始
 
 ```bash
 python3 -m venv .venv
@@ -107,80 +52,27 @@ cp .env.example .env
 python -m pytest
 ```
 
-### 环境变量
-
-编辑 `.env`：
-
-| 变量 | 默认值 | 说明 |
-|---|---|---|
-| `LLM_PROVIDER` | `qwen` | 可选 `qwen`、`openai`、`deepseek`、`mock` |
-| `QWEN_API_KEY` | `your_key` | Qwen API Key |
-| `QWEN_MODEL` | `qwen-plus` | Qwen 模型名 |
-| `OPENAI_API_KEY` | `your_key` | OpenAI API Key |
-| `DEEPSEEK_API_KEY` | `your_key` | DeepSeek API Key |
-| `EMBEDDING_MODEL` | `BAAI/bge-small-en-v1.5` | sentence-transformers 模型 |
-| `VECTOR_STORE_PATH` | `data/processed/faiss_index` | FAISS 索引输出路径 |
-| `DEFAULT_CHUNK_SIZE` | `512` | 默认 chunk 大小 |
-| `DEFAULT_CHUNK_OVERLAP` | `80` | 默认 chunk overlap |
-| `DEFAULT_TOP_K` | `5` | 默认检索数量 |
-| `MOCK_LLM` | `false` | 设置为 `true` 可不调用真实 API |
-
-Qwen 示例配置：
-
-```bash
-LLM_PROVIDER=qwen
-QWEN_API_KEY=your_qwen_api_key
-QWEN_MODEL=qwen-plus
-MOCK_LLM=false
-```
-
-本地离线测试配置：
-
-```bash
-MOCK_LLM=true
-```
-
-### 使用方法
-
-运行 baseline：
-
-```bash
-python experiments/run_baseline.py
-```
-
-运行消融实验：
-
-```bash
-python experiments/run_ablation.py
-```
-
-生成图表：
-
-```bash
-python experiments/plot_results.py
-```
-
 启动 Web Demo：
 
 ```bash
 streamlit run app/streamlit_app.py
 ```
 
-打开 `http://localhost:8501`，点击 `Build Index`，输入问题后点击 `Ask`，即可查看生成答案、检索上下文、unsupported spans 和评测指标。
-
-启动幻觉检测 API：
+启动 API 服务：
 
 ```bash
 uvicorn api.server:app --host 0.0.0.0 --port 8000
 ```
 
-接口文档地址：
+打开接口文档：
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-检测外部 RAG 系统输出：
+## 最小 API 示例
+
+检测一条外部 RAG 输出：
 
 ```bash
 curl -s http://127.0.0.1:8000/evaluate \
@@ -196,9 +88,89 @@ curl -s http://127.0.0.1:8000/evaluate \
 }'
 ```
 
-批量检测外部 RAG 输出使用 `POST /batch_evaluate`，详见 [docs/api.md](docs/api.md)。
+常用端点：
 
-外部开源 RAG 项目 smoke test 结果见 [docs/external_ragflow_eval.md](docs/external_ragflow_eval.md)。
+| Endpoint | 方法 | 用途 |
+|---|---|---|
+| `/health` | GET | 服务健康检查 |
+| `/detect` | POST | 只做 claim 级幻觉检测 |
+| `/evaluate` | POST | 单条样本检测并计算指标 |
+| `/batch_evaluate` | POST | 批量检测外部 RAG 输出 |
+
+详见 [docs/api.md](docs/api.md)。
+
+## 架构
+
+![RAG Hallucination Eval Architecture](docs/assets/architecture.svg)
+
+内置 demo 和外部系统输出最终都会进入同一个检测核心。稳定输入契约是：
+
+```text
+question + answer + contexts
+```
+
+核心处理链路：
+
+1. `src/document_loader.py` 将文档标准化为内部 `Document`。
+2. `src/chunker.py` 切分文本并保留 `source`、`page`、`chunk_id`。
+3. `src/embedder.py` 优先使用 sentence-transformers，失败时回退 hashing embedding。
+4. `src/retriever.py` 使用 FAISS 执行 top-k 检索。
+5. `src/generator.py` 通过 grounding prompt 生成带上下文约束的答案。
+6. `src/hallucination_detector.py` 做 claim 级支持性判断。
+7. `src/evaluator.py` 计算 faithfulness、answer relevancy、context precision、citation accuracy 和 hallucination rate。
+
+## 配置
+
+编辑 `.env`：
+
+| 变量 | 默认值 | 说明 |
+|---|---|---|
+| `LLM_PROVIDER` | `qwen` | 可选 `qwen`、`openai`、`deepseek`、`mock` |
+| `QWEN_API_KEY` | `your_key` | Qwen API key |
+| `QWEN_MODEL` | `qwen-plus` | Qwen 模型名 |
+| `OPENAI_API_KEY` | `your_key` | OpenAI API key |
+| `DEEPSEEK_API_KEY` | `your_key` | DeepSeek API key |
+| `EMBEDDING_MODEL` | `BAAI/bge-small-en-v1.5` | sentence-transformers 模型 |
+| `VECTOR_STORE_PATH` | `data/processed/faiss_index` | FAISS 索引输出路径 |
+| `DEFAULT_CHUNK_SIZE` | `512` | 默认 chunk 大小 |
+| `DEFAULT_CHUNK_OVERLAP` | `80` | 默认 chunk overlap |
+| `DEFAULT_TOP_K` | `5` | 默认检索数量 |
+| `MOCK_LLM` | `false` | 设置为 `true` 后不调用真实 LLM API |
+
+Qwen 示例：
+
+```bash
+LLM_PROVIDER=qwen
+QWEN_API_KEY=your_qwen_api_key
+QWEN_MODEL=qwen-plus
+MOCK_LLM=false
+```
+
+离线测试：
+
+```bash
+MOCK_LLM=true
+```
+
+## 实验与数据集
+
+运行 baseline：
+
+```bash
+python experiments/run_baseline.py
+```
+
+运行消融实验：
+
+```bash
+python experiments/run_ablation.py
+```
+
+生成结果图：
+
+```bash
+python experiments/plot_results.py
+```
 
 导入外部评测集：
 
@@ -213,21 +185,11 @@ python scripts/import_datasets.py \
 
 支持 `ragtruth`、`ragbench`、`halueval`、`generic` 四种导入 profile，详见 [docs/datasets.md](docs/datasets.md)。
 
-生成 1000 条 RAGBench 本地评测集：
+当前仓库包含 `data/eval_sets/ragbench_covidqa_1000.json`，来源为 RAGBench `covidqa/train`，共 1000 条，其中 `supported` 858 条、`unsupported` 142 条。
 
-```bash
-python scripts/download_ragbench_sample.py \
-  --subset covidqa \
-  --split train \
-  --limit 1000 \
-  --output data/eval_sets/ragbench_covidqa_1000.json
-```
+## 运行结果展示
 
-当前仓库已包含 `data/eval_sets/ragbench_covidqa_1000.json`，来源为 RAGBench `covidqa/train`，共 1000 条，其中 `supported` 858 条、`unsupported` 142 条。
-
-### 运行结果展示
-
-baseline 运行输出：
+Baseline 输出：
 
 ```text
 Saved 5 rows to results/baseline_results.csv
@@ -237,7 +199,7 @@ avg_context_precision: 0.4000
 avg_hallucination_rate: 0.0000
 ```
 
-baseline 指标：
+Baseline 指标：
 
 | 指标 | 结果 |
 |---|---:|
@@ -247,33 +209,7 @@ baseline 指标：
 | avg_context_precision | 0.4000 |
 | avg_hallucination_rate | 0.0000 |
 
-消融实验运行输出：
-
-```text
-[1/10] Running chunk_size_256
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[2/10] Running chunk_size_512
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[3/10] Running chunk_size_1024
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[4/10] Running top_k_3
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[5/10] Running top_k_5
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[6/10] Running top_k_8
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[7/10] Running query_rewrite_false
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[8/10] Running query_rewrite_true
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[9/10] Running reranker_false
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-[10/10] Running reranker_true
-  ok faithfulness=1.0000 hallucination_rate=0.0000
-Saved 10 ablation rows to results/ablation_results.csv
-```
-
-消融实验汇总：
+消融实验摘要：
 
 | setting | faithfulness | answer_relevancy | context_precision | hallucination_rate |
 |---|---:|---:|---:|---:|
@@ -294,7 +230,27 @@ Saved 10 ablation rows to results/ablation_results.csv
 
 ![Baseline vs Query Rewrite](docs/assets/baseline_vs_query_rewrite.png)
 
-### 输出文件
+## 项目结构
+
+```text
+rag-hallucination-eval/
+├── api/                         # FastAPI 服务
+├── app/                         # Streamlit Web Demo
+├── data/
+│   ├── documents/               # 示例知识库文档
+│   ├── eval_sets/               # 评测集
+│   ├── imported/                # 本地导入缓存
+│   └── processed/               # FAISS 索引输出
+├── docs/                        # API、数据集、外部测试文档
+├── experiments/                 # baseline、ablation、plot 脚本
+├── scripts/                     # 数据集下载与导入脚本
+├── src/                         # 核心 RAG 与幻觉检测模块
+├── tests/                       # pytest 测试
+├── README.md
+└── README_EN.md
+```
+
+## 输出文件
 
 | 路径 | 内容 |
 |---|---|
@@ -304,18 +260,18 @@ Saved 10 ablation rows to results/ablation_results.csv
 | `results/figures/` | Matplotlib 输出图表 |
 | `data/processed/faiss_index*` | 本地 FAISS 索引文件 |
 
-### 当前验证状态
+## 验证状态
 
-已在本地验证：
+当前本地测试：
 
 ```text
-19 passed, 1 warning
+32 passed, 2 warnings
 ```
 
-### 已知限制
+## 已知限制
 
 - Reranker 目前是实验开关，占位接入，尚未实现真实重排策略。
 - Query rewrite 已接入 LLM provider；mock 模式或缺少 provider key 时会回退到原问题。
 - fallback evaluator 基于词面重叠，不等同于强语义评测。
 - Ragas、DeepEval、LettuceDetect 目前不是稳定流程的必需依赖。
-- 项目当前没有检测到 `LICENSE` 文件；正式开源建议补充许可证。
+- 项目当前没有检测到 `LICENSE` 文件。
