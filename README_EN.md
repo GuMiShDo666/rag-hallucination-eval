@@ -72,51 +72,7 @@ rag-hallucination-eval/
 
 ### Architecture
 
-```mermaid
-flowchart LR
-    subgraph Input["Input Layer"]
-        A["Local Documents<br/>txt / md / pdf"]
-        B["Evaluation Sets<br/>sample / RAGBench 1000"]
-        C["External RAG Output<br/>question + answer + contexts"]
-    end
-
-    subgraph DemoRAG["Built-in RAG Demo"]
-        D["Document Loader"]
-        E["Chunker"]
-        F["Embedder<br/>BGE / hashing fallback"]
-        G["FAISS Retriever"]
-        H["LLM Generator<br/>Qwen / OpenAI / DeepSeek / Mock"]
-    end
-
-    subgraph Core["Detection and Evaluation Core"]
-        I["Query Rewriter<br/>optional"]
-        J["Hallucination Detector<br/>claim-level labels"]
-        K["RAG Evaluator<br/>metrics"]
-    end
-
-    subgraph Delivery["Delivery Layer"]
-        L["FastAPI<br/>/detect /evaluate /batch_evaluate"]
-        M["Experiments<br/>baseline / ablation"]
-        N["Streamlit Demo"]
-        O["Outputs<br/>CSV / figures / reports"]
-    end
-
-    A --> D --> E --> F --> G
-    B --> M
-    G --> H
-    H --> J
-    G --> J
-    C --> L
-    L --> J
-    L --> K
-    I --> G
-    J --> K
-    K --> L
-    K --> M
-    K --> N
-    M --> O
-    N --> O
-```
+![RAG Hallucination Eval Architecture](docs/assets/architecture.svg)
 
 ### How It Works
 

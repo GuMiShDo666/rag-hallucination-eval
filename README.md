@@ -72,51 +72,7 @@ rag-hallucination-eval/
 
 ### 架构图
 
-```mermaid
-flowchart LR
-    subgraph Input["输入层"]
-        A["本地文档<br/>txt / md / pdf"]
-        B["评测集<br/>sample / RAGBench 1000"]
-        C["外部 RAG 输出<br/>question + answer + contexts"]
-    end
-
-    subgraph DemoRAG["内置 RAG Demo"]
-        D["Document Loader"]
-        E["Chunker"]
-        F["Embedder<br/>BGE / hashing fallback"]
-        G["FAISS Retriever"]
-        H["LLM Generator<br/>Qwen / OpenAI / DeepSeek / Mock"]
-    end
-
-    subgraph Core["幻觉检测与评测核心"]
-        I["Query Rewriter<br/>optional"]
-        J["Hallucination Detector<br/>claim-level labels"]
-        K["RAG Evaluator<br/>metrics"]
-    end
-
-    subgraph Delivery["交付层"]
-        L["FastAPI<br/>/detect /evaluate /batch_evaluate"]
-        M["Experiments<br/>baseline / ablation"]
-        N["Streamlit Demo"]
-        O["Outputs<br/>CSV / figures / reports"]
-    end
-
-    A --> D --> E --> F --> G
-    B --> M
-    G --> H
-    H --> J
-    G --> J
-    C --> L
-    L --> J
-    L --> K
-    I --> G
-    J --> K
-    K --> L
-    K --> M
-    K --> N
-    M --> O
-    N --> O
-```
+![RAG Hallucination Eval Architecture](docs/assets/architecture.svg)
 
 ### 底层原理
 
