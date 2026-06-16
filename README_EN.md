@@ -73,24 +73,49 @@ rag-hallucination-eval/
 ### Architecture
 
 ```mermaid
-flowchart TD
-    A["Raw Documents<br/>txt / md / pdf"] --> B["Document Loader"]
-    B --> C["Chunker<br/>size + overlap"]
-    C --> D["Embedder<br/>BGE or hashing fallback"]
-    D --> E["FAISS Retriever"]
-    Q["User Question"] --> E
-    E --> F["Top-K Context Chunks"]
-    Q --> G["LLM Generator<br/>Qwen / OpenAI / DeepSeek / Mock"]
-    F --> G
-    G --> H["Grounded Answer<br/>with citations"]
-    H --> I["Hallucination Detector"]
-    F --> I
-    I --> J["Claim Labels<br/>supported / unsupported / contradicted / unclear"]
-    H --> K["Evaluator"]
-    F --> K
+flowchart LR
+    subgraph Input["Input Layer"]
+        A["Local Documents<br/>txt / md / pdf"]
+        B["Evaluation Sets<br/>sample / RAGBench 1000"]
+        C["External RAG Output<br/>question + answer + contexts"]
+    end
+
+    subgraph DemoRAG["Built-in RAG Demo"]
+        D["Document Loader"]
+        E["Chunker"]
+        F["Embedder<br/>BGE / hashing fallback"]
+        G["FAISS Retriever"]
+        H["LLM Generator<br/>Qwen / OpenAI / DeepSeek / Mock"]
+    end
+
+    subgraph Core["Detection and Evaluation Core"]
+        I["Query Rewriter<br/>optional"]
+        J["Hallucination Detector<br/>claim-level labels"]
+        K["RAG Evaluator<br/>metrics"]
+    end
+
+    subgraph Delivery["Delivery Layer"]
+        L["FastAPI<br/>/detect /evaluate /batch_evaluate"]
+        M["Experiments<br/>baseline / ablation"]
+        N["Streamlit Demo"]
+        O["Outputs<br/>CSV / figures / reports"]
+    end
+
+    A --> D --> E --> F --> G
+    B --> M
+    G --> H
+    H --> J
+    G --> J
+    C --> L
+    L --> J
+    L --> K
+    I --> G
     J --> K
-    K --> L["Metrics<br/>faithfulness / relevancy / precision / hallucination rate"]
-    L --> M["CSV Results<br/>Figures<br/>Streamlit Demo"]
+    K --> L
+    K --> M
+    K --> N
+    M --> O
+    N --> O
 ```
 
 ### How It Works
