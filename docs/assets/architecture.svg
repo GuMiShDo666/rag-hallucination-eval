@@ -1,153 +1,155 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="620" viewBox="0 0 1600 620" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="800" viewBox="0 0 1800 800" role="img" aria-labelledby="title desc">
   <title id="title">RAG Hallucination Eval Architecture</title>
-  <desc id="desc">Hand-drawn style architecture flow for external RAG hallucination detection and evaluation.</desc>
+  <desc id="desc">Readable architecture flow showing inputs, built-in RAG, claim detection, evaluation API, and results.</desc>
   <defs>
     <linearGradient id="arrowGradient" x1="0" x2="1" y1="0" y2="0">
-      <stop offset="0%" stop-color="#7dd3fc"/>
-      <stop offset="100%" stop-color="#c084fc"/>
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
     </linearGradient>
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#64748b" flood-opacity="0.14"/>
-    </filter>
-    <marker id="arrowHead" markerWidth="16" markerHeight="16" refX="11" refY="8" orient="auto">
-      <path d="M2,2 L12,8 L2,14" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <marker id="arrowHead" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+      <path d="M2,2 L9,6 L2,10" fill="none" stroke="#8b5cf6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="smallArrowHead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M2,2 L8,5 L2,8" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
     <style>
-      .title { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 26px; font-weight: 800; fill: #111827; }
-      .subtitle { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 18px; font-weight: 700; fill: #374151; }
-      .body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 16px; fill: #111827; }
-      .small { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; fill: #4b5563; }
-      .card { fill: #ffffff; stroke: #111827; stroke-width: 3; rx: 18; filter: url(#softShadow); }
-      .soft { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; rx: 14; }
-      .arrow { fill: none; stroke: url(#arrowGradient); stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrowHead); }
-      .thinArrow { fill: none; stroke: #93c5fd; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrowHead); }
-      .accentBlue { fill: #dbeafe; stroke: #2563eb; }
-      .accentGreen { fill: #dcfce7; stroke: #16a34a; }
-      .accentAmber { fill: #fef3c7; stroke: #d97706; }
-      .accentRose { fill: #ffe4e6; stroke: #e11d48; }
-      .accentViolet { fill: #ede9fe; stroke: #7c3aed; }
+      .title { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 32px; font-weight: 800; fill: #111827; }
+      .subtitle { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 22px; font-weight: 800; fill: #1f2937; }
+      .body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 20px; fill: #111827; }
+      .small { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 16px; fill: #4b5563; }
+      .tiny { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; fill: #4b5563; }
+      .card { fill: #ffffff; stroke: #111827; stroke-width: 3; filter: url(#softShadow); }
+      .note { fill: #f8fafc; stroke: #93c5fd; stroke-width: 2.5; }
+      .contract { fill: #eff6ff; stroke: #2563eb; stroke-width: 2.5; }
+      .mainArrow { fill: none; stroke: url(#arrowGradient); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrowHead); }
+      .routeArrow { fill: none; stroke: #60a5fa; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 8 10; marker-end: url(#smallArrowHead); }
+      .contractLine { fill: none; stroke: #2563eb; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 7 9; }
     </style>
   </defs>
 
-  <rect width="1600" height="620" fill="#ffffff"/>
+  <rect width="1800" height="800" fill="#ffffff"/>
 
-  <text x="800" y="48" text-anchor="middle" class="title">RAG Hallucination Eval Architecture</text>
-  <text x="800" y="78" text-anchor="middle" class="small">External RAG outputs or built-in demo pipeline flow into the same hallucination detection core</text>
+  <text x="900" y="58" text-anchor="middle" class="title">RAG Hallucination Eval Architecture</text>
+  <text x="900" y="94" text-anchor="middle" class="small">Built-in RAG demos and external RAG outputs share one hallucination evaluation core.</text>
 
-  <path class="arrow" d="M275 322 C340 322, 355 322, 420 322"/>
-  <path class="arrow" d="M585 322 C650 322, 665 322, 730 322"/>
-  <path class="arrow" d="M895 322 C960 322, 975 322, 1040 322"/>
-  <path class="arrow" d="M1205 322 C1270 322, 1285 322, 1350 322"/>
-  <path class="thinArrow" d="M260 152 C365 96, 600 102, 735 214"/>
-  <path class="thinArrow" d="M260 192 C405 150, 870 132, 1044 226"/>
-
-  <!-- Step 1 -->
-  <g transform="translate(82 180)">
-    <rect class="card" width="220" height="250"/>
-    <g transform="translate(78 26)">
-      <rect x="0" y="0" width="62" height="78" rx="7" fill="#fff7ed" stroke="#111827" stroke-width="3"/>
-      <path d="M45 0 L62 17 L45 17 Z" fill="#fde68a" stroke="#111827" stroke-width="2"/>
-      <line x1="13" y1="25" x2="48" y2="25" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
-      <line x1="13" y1="39" x2="48" y2="39" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
-      <line x1="13" y1="53" x2="38" y2="53" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+  <g transform="translate(640 124)">
+    <rect width="520" height="86" rx="18" fill="#f8fafc" stroke="#93c5fd" stroke-width="2.5"/>
+    <text x="260" y="34" text-anchor="middle" class="subtitle">Two Entry Modes</text>
+    <text x="260" y="62" text-anchor="middle" class="small">demo pipeline or API-only external outputs</text>
+  </g>
+  <g transform="translate(80 245)">
+    <rect width="250" height="330" rx="22" fill="#f8fafc" stroke="#111827" stroke-width="6"/>
+    <path d="M0 0 H250 V330 H0 Z" fill="none" stroke="#111827" stroke-width="6"/>
+    <g transform="translate(92 28)">
+      <rect x="0" y="0" width="66" height="82" rx="7" fill="#fff7ed" stroke="#111827" stroke-width="3"/>
+      <path d="M48 0 L66 18 L48 18 Z" fill="#fde68a" stroke="#111827" stroke-width="2"/>
+      <line x1="14" y1="27" x2="50" y2="27" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+      <line x1="14" y1="43" x2="50" y2="43" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+      <line x1="14" y1="59" x2="40" y2="59" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
     </g>
-    <text x="110" y="128" text-anchor="middle" class="subtitle">Step 1</text>
-    <line x1="54" y1="137" x2="166" y2="137" stroke="#111827" stroke-width="2"/>
-    <text x="110" y="165" text-anchor="middle" class="body">Inputs</text>
-    <text x="110" y="194" text-anchor="middle" class="small">documents</text>
-    <text x="110" y="215" text-anchor="middle" class="small">eval sets</text>
-    <text x="110" y="236" text-anchor="middle" class="small">external RAG outputs</text>
+    <text x="125" y="150" text-anchor="middle" class="subtitle">Step 1</text>
+    <line x1="66" y1="164" x2="184" y2="164" stroke="#111827" stroke-width="2"/>
+    <text x="125" y="202" text-anchor="middle" class="body">Inputs</text>
+    <text x="125" y="238" text-anchor="middle" class="small">documents</text>
+    <text x="125" y="266" text-anchor="middle" class="small">eval sets</text>
+    <text x="125" y="294" text-anchor="middle" class="small">RAG outputs</text>
   </g>
 
-  <!-- Cold start notes -->
-  <g transform="translate(430 96)">
-    <rect class="soft accentViolet" width="300" height="96"/>
-    <text x="150" y="36" text-anchor="middle" class="subtitle">Two Entry Modes</text>
-    <text x="150" y="64" text-anchor="middle" class="small">built-in RAG demo or API-only</text>
-  </g>
+  <path d="M356 410 L382 410" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round"/>
+  <path d="M382 396 L402 410 L382 424 Z" fill="#8b5cf6"/>
 
-  <!-- Step 2 -->
-  <g transform="translate(402 180)">
-    <rect class="card" width="220" height="250"/>
-    <g transform="translate(57 26)">
-      <rect x="0" y="20" width="62" height="70" rx="8" fill="#eff6ff" stroke="#111827" stroke-width="3"/>
-      <rect x="48" y="8" width="62" height="70" rx="8" fill="#ecfeff" stroke="#111827" stroke-width="3"/>
-      <circle cx="31" cy="55" r="14" fill="#60a5fa" stroke="#111827" stroke-width="3"/>
-      <path d="M81 42 L95 57 L75 57 Z" fill="#34d399" stroke="#111827" stroke-width="3"/>
-      <line x1="14" y1="42" x2="36" y2="42" stroke="#111827" stroke-width="3"/>
-      <line x1="62" y1="28" x2="94" y2="28" stroke="#111827" stroke-width="3"/>
+  <g transform="translate(410 245)">
+    <rect width="250" height="330" rx="22" fill="#f8fafc" stroke="#111827" stroke-width="6"/>
+    <path d="M0 0 H250 V330 H0 Z" fill="none" stroke="#111827" stroke-width="6"/>
+    <g transform="translate(70 30)">
+      <rect x="0" y="22" width="66" height="74" rx="8" fill="#eff6ff" stroke="#111827" stroke-width="3"/>
+      <rect x="52" y="8" width="66" height="74" rx="8" fill="#ecfeff" stroke="#111827" stroke-width="3"/>
+      <circle cx="34" cy="59" r="15" fill="#60a5fa" stroke="#111827" stroke-width="3"/>
+      <path d="M86 46 L101 62 L79 62 Z" fill="#34d399" stroke="#111827" stroke-width="3"/>
+      <line x1="16" y1="46" x2="40" y2="46" stroke="#111827" stroke-width="3"/>
+      <line x1="66" y1="32" x2="100" y2="32" stroke="#111827" stroke-width="3"/>
     </g>
-    <text x="110" y="128" text-anchor="middle" class="subtitle">Step 2</text>
-    <line x1="54" y1="137" x2="166" y2="137" stroke="#111827" stroke-width="2"/>
-    <text x="110" y="165" text-anchor="middle" class="body">Built-in RAG</text>
-    <text x="110" y="194" text-anchor="middle" class="small">chunk + embed</text>
-    <text x="110" y="215" text-anchor="middle" class="small">FAISS retrieve</text>
-    <text x="110" y="236" text-anchor="middle" class="small">Qwen / mock generate</text>
+    <text x="125" y="150" text-anchor="middle" class="subtitle">Step 2</text>
+    <line x1="66" y1="164" x2="184" y2="164" stroke="#111827" stroke-width="2"/>
+    <text x="125" y="202" text-anchor="middle" class="body">Built-in RAG</text>
+    <text x="125" y="238" text-anchor="middle" class="small">load and chunk</text>
+    <text x="125" y="266" text-anchor="middle" class="small">embed retrieve</text>
+    <text x="125" y="294" text-anchor="middle" class="small">generate answer</text>
   </g>
 
-  <!-- Step 3 -->
-  <g transform="translate(722 180)">
-    <rect class="card" width="220" height="250"/>
-    <g transform="translate(55 24)">
-      <rect x="6" y="38" width="92" height="58" rx="12" fill="#f8fafc" stroke="#111827" stroke-width="3"/>
-      <path d="M32 96 L20 118 L58 96" fill="#f8fafc" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
-      <circle cx="104" cy="28" r="35" fill="#ffffff" stroke="#111827" stroke-width="4"/>
-      <text x="104" y="43" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="48" font-weight="900" fill="#111827">?</text>
-      <line x1="26" y1="56" x2="78" y2="56" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
-      <line x1="26" y1="72" x2="72" y2="72" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M686 410 L712 410" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round"/>
+  <path d="M712 396 L732 410 L712 424 Z" fill="#8b5cf6"/>
+
+  <g transform="translate(740 245)">
+    <rect width="250" height="330" rx="22" fill="#f8fafc" stroke="#111827" stroke-width="6"/>
+    <path d="M0 0 H250 V330 H0 Z" fill="none" stroke="#111827" stroke-width="6"/>
+    <g transform="translate(67 28)">
+      <rect x="6" y="42" width="96" height="62" rx="12" fill="#f8fafc" stroke="#111827" stroke-width="3"/>
+      <path d="M34 104 L22 126 L62 104" fill="#f8fafc" stroke="#111827" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="110" cy="32" r="36" fill="#ffffff" stroke="#111827" stroke-width="4"/>
+      <text x="110" y="48" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="50" font-weight="900" fill="#111827">?</text>
+      <line x1="28" y1="61" x2="82" y2="61" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+      <line x1="28" y1="78" x2="76" y2="78" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
     </g>
-    <text x="110" y="128" text-anchor="middle" class="subtitle">Step 3</text>
-    <line x1="54" y1="137" x2="166" y2="137" stroke="#111827" stroke-width="2"/>
-    <text x="110" y="165" text-anchor="middle" class="body">Detect Claims</text>
-    <text x="110" y="194" text-anchor="middle" class="small">supported</text>
-    <text x="110" y="215" text-anchor="middle" class="small">unsupported</text>
-    <text x="110" y="236" text-anchor="middle" class="small">contradicted / unclear</text>
+    <text x="125" y="150" text-anchor="middle" class="subtitle">Step 3</text>
+    <line x1="66" y1="164" x2="184" y2="164" stroke="#111827" stroke-width="2"/>
+    <text x="125" y="202" text-anchor="middle" class="body">Detect Claims</text>
+    <text x="125" y="238" text-anchor="middle" class="small">supported</text>
+    <text x="125" y="266" text-anchor="middle" class="small">unsupported</text>
+    <text x="125" y="294" text-anchor="middle" class="small">contradicted</text>
   </g>
 
-  <!-- Step 4 -->
-  <g transform="translate(1042 180)">
-    <rect class="card" width="220" height="250"/>
-    <g transform="translate(58 24)">
-      <rect x="0" y="42" width="110" height="72" rx="10" fill="#f0fdf4" stroke="#111827" stroke-width="3"/>
-      <rect x="15" y="58" width="34" height="34" fill="#bbf7d0" stroke="#111827" stroke-width="3"/>
-      <line x1="64" y1="61" x2="94" y2="61" stroke="#111827" stroke-width="3"/>
-      <line x1="64" y1="77" x2="94" y2="77" stroke="#111827" stroke-width="3"/>
-      <line x1="64" y1="93" x2="86" y2="93" stroke="#111827" stroke-width="3"/>
-      <circle cx="25" cy="17" r="13" fill="#fde68a" stroke="#111827" stroke-width="3"/>
-      <path d="M76 8 L95 8 L95 27 L76 27 Z" fill="#fecdd3" stroke="#111827" stroke-width="3"/>
+  <path d="M1016 410 L1042 410" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1042 396 L1062 410 L1042 424 Z" fill="#8b5cf6"/>
+
+  <g transform="translate(1070 245)">
+    <rect width="250" height="330" rx="22" fill="#f8fafc" stroke="#111827" stroke-width="6"/>
+    <path d="M0 0 H250 V330 H0 Z" fill="none" stroke="#111827" stroke-width="6"/>
+    <g transform="translate(70 30)">
+      <rect x="0" y="44" width="112" height="76" rx="10" fill="#f0fdf4" stroke="#111827" stroke-width="3"/>
+      <rect x="16" y="60" width="36" height="36" fill="#bbf7d0" stroke="#111827" stroke-width="3"/>
+      <line x1="66" y1="63" x2="98" y2="63" stroke="#111827" stroke-width="3"/>
+      <line x1="66" y1="80" x2="98" y2="80" stroke="#111827" stroke-width="3"/>
+      <line x1="66" y1="97" x2="90" y2="97" stroke="#111827" stroke-width="3"/>
+      <circle cx="26" cy="18" r="14" fill="#fde68a" stroke="#111827" stroke-width="3"/>
+      <rect x="78" y="8" width="20" height="20" fill="#fecdd3" stroke="#111827" stroke-width="3"/>
     </g>
-    <text x="110" y="128" text-anchor="middle" class="subtitle">Step 4</text>
-    <line x1="54" y1="137" x2="166" y2="137" stroke="#111827" stroke-width="2"/>
-    <text x="110" y="165" text-anchor="middle" class="body">Evaluate API</text>
-    <text x="110" y="194" text-anchor="middle" class="small">/detect</text>
-    <text x="110" y="215" text-anchor="middle" class="small">/evaluate</text>
-    <text x="110" y="236" text-anchor="middle" class="small">/batch_evaluate</text>
+    <text x="125" y="150" text-anchor="middle" class="subtitle">Step 4</text>
+    <line x1="66" y1="164" x2="184" y2="164" stroke="#111827" stroke-width="2"/>
+    <text x="125" y="202" text-anchor="middle" class="body">Evaluate API</text>
+    <text x="125" y="238" text-anchor="middle" class="small">/detect</text>
+    <text x="125" y="266" text-anchor="middle" class="small">/evaluate</text>
+    <text x="125" y="294" text-anchor="middle" class="small">/batch_evaluate</text>
   </g>
 
-  <!-- Step 5 -->
-  <g transform="translate(1362 180)">
-    <rect class="card" width="220" height="250"/>
-    <g transform="translate(58 24)">
-      <rect x="2" y="40" width="106" height="74" rx="8" fill="#fef3c7" stroke="#111827" stroke-width="3"/>
-      <rect x="16" y="78" width="14" height="24" fill="#60a5fa" stroke="#111827" stroke-width="2"/>
-      <rect x="42" y="62" width="14" height="40" fill="#34d399" stroke="#111827" stroke-width="2"/>
-      <rect x="68" y="52" width="14" height="50" fill="#fb7185" stroke="#111827" stroke-width="2"/>
-      <line x1="12" y1="28" x2="96" y2="28" stroke="#111827" stroke-width="3"/>
-      <path d="M86 18 L104 28 L86 38" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1346 410 L1372 410" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1372 396 L1392 410 L1372 424 Z" fill="#8b5cf6"/>
+
+  <g transform="translate(1400 245)">
+    <rect width="250" height="330" rx="22" fill="#f8fafc" stroke="#111827" stroke-width="6"/>
+    <path d="M0 0 H250 V330 H0 Z" fill="none" stroke="#111827" stroke-width="6"/>
+    <g transform="translate(72 30)">
+      <rect x="2" y="42" width="110" height="78" rx="8" fill="#fef3c7" stroke="#111827" stroke-width="3"/>
+      <rect x="18" y="82" width="15" height="26" fill="#60a5fa" stroke="#111827" stroke-width="2"/>
+      <rect x="46" y="64" width="15" height="44" fill="#34d399" stroke="#111827" stroke-width="2"/>
+      <rect x="74" y="52" width="15" height="56" fill="#fb7185" stroke="#111827" stroke-width="2"/>
+      <line x1="14" y1="28" x2="100" y2="28" stroke="#111827" stroke-width="3"/>
+      <path d="M90 18 L108 28 L90 38" fill="none" stroke="#111827" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <text x="110" y="128" text-anchor="middle" class="subtitle">Step 5</text>
-    <line x1="54" y1="137" x2="166" y2="137" stroke="#111827" stroke-width="2"/>
-    <text x="110" y="165" text-anchor="middle" class="body">Results</text>
-    <text x="110" y="194" text-anchor="middle" class="small">CSV metrics</text>
-    <text x="110" y="215" text-anchor="middle" class="small">figures</text>
-    <text x="110" y="236" text-anchor="middle" class="small">reports</text>
+    <text x="125" y="150" text-anchor="middle" class="subtitle">Step 5</text>
+    <line x1="66" y1="164" x2="184" y2="164" stroke="#111827" stroke-width="2"/>
+    <text x="125" y="202" text-anchor="middle" class="body">Results</text>
+    <text x="125" y="238" text-anchor="middle" class="small">CSV metrics</text>
+    <text x="125" y="266" text-anchor="middle" class="small">figures</text>
+    <text x="125" y="294" text-anchor="middle" class="small">reports</text>
   </g>
 
-  <g transform="translate(668 454)">
-    <rect class="soft accentBlue" width="300" height="92"/>
-    <text x="150" y="34" text-anchor="middle" class="subtitle">Core Contract</text>
-    <text x="150" y="62" text-anchor="middle" class="small">question + answer + contexts</text>
+  <g transform="translate(690 655)">
+    <rect width="420" height="78" rx="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
+    <text x="210" y="32" text-anchor="middle" class="subtitle">Core Contract</text>
+    <text x="210" y="58" text-anchor="middle" class="small">question + answer + contexts</text>
   </g>
-
-  <path class="thinArrow" d="M810 454 C820 425, 824 405, 832 382"/>
+  <path d="M900 655 L900 600" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 9"/>
+  <path d="M900 600 L1195 600" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 9"/>
+  <path d="M1195 600 L1195 575" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 9"/>
 </svg>
