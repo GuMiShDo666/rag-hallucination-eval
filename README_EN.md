@@ -217,6 +217,8 @@ curl -s http://127.0.0.1:8000/evaluate \
 
 Use `POST /batch_evaluate` for batch external RAG outputs. See [docs/api.md](docs/api.md).
 
+External open-source RAG smoke test results are documented in [docs/external_ragflow_eval.md](docs/external_ragflow_eval.md).
+
 Import an external evaluation dataset:
 
 ```bash

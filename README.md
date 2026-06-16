@@ -217,6 +217,8 @@ curl -s http://127.0.0.1:8000/evaluate \
 
 批量检测外部 RAG 输出使用 `POST /batch_evaluate`，详见 [docs/api.md](docs/api.md)。
 
+外部开源 RAG 项目 smoke test 结果见 [docs/external_ragflow_eval.md](docs/external_ragflow_eval.md)。
+
 导入外部评测集：
 
 ```bash
