@@ -26,7 +26,8 @@ The default provider is Qwen through an OpenAI-compatible API. OpenAI, DeepSeek,
 | Generation | Uses a context-grounded prompt and citation-style references such as `[1]` |
 | Hallucination detection | Labels claims as `supported`, `unsupported`, `contradicted`, or `unclear` |
 | Evaluation | Reports faithfulness, answer relevancy, context precision, citation accuracy, and hallucination rate |
-| Experiments | Includes baseline runs, ablations, and Matplotlib plots |
+| Query rewriting | Uses the active LLM provider to rewrite questions into retrieval-oriented queries |
+| Experiments | Includes baseline runs, chunk/top-k/query rewrite ablations, and Matplotlib plots |
 | Demo | Provides a Streamlit interface for indexing, asking questions, and inspecting metrics |
 
 ### Directory Layout
@@ -98,10 +99,13 @@ flowchart TD
 4. **Context-grounded generation**  
    `src/generator.py` builds a fixed prompt that instructs the model to answer only from retrieved context and to report insufficient context when needed. Qwen calls use the DashScope OpenAI-compatible endpoint.
 
-5. **Claim-level detection**  
+5. **Query rewriting**  
+   `src/query_rewriter.py` calls the active LLM provider when `use_query_rewrite=True` and rewrites the natural-language question into a shorter retrieval query. Mock mode or missing provider keys fall back to the original question.
+
+6. **Claim-level detection**  
    `src/hallucination_detector.py` checks smaller answer spans against retrieved context and returns support labels.
 
-6. **Metric calculation**  
+7. **Metric calculation**  
    `src/evaluator.py` computes faithfulness, answer relevancy, context precision, citation accuracy, and hallucination rate. The fallback evaluator uses lexical overlap for reproducible local runs.
 
 ### Quick Start
@@ -264,7 +268,8 @@ Latest local test run:
 
 ### Limitations
 
-- Query rewrite and reranker switches are placeholders for future implementation.
+- The reranker switch is still a placeholder for future implementation.
+- Query rewriting uses the configured LLM provider and falls back to the original question in mock mode or when provider keys are missing.
 - The fallback evaluator uses lexical overlap and is not a high-precision semantic judge.
 - Ragas, DeepEval, and LettuceDetect are not required by the stable local workflow.
 - No `LICENSE` file is currently included. Add one before treating the repository as formally open source.

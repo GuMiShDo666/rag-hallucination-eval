@@ -12,6 +12,7 @@ from src.embedder import Embedder
 from src.evaluator import RAGEvaluator
 from src.generator import LLMGenerator
 from src.hallucination_detector import HallucinationDetector
+from src.query_rewriter import QueryRewriter
 from src.retriever import FaissRetriever, RetrievedChunk
 
 
@@ -29,6 +30,7 @@ class RAGHallucinationPipeline:
         settings: Settings | None = None,
         embedder: Any | None = None,
         generator: LLMGenerator | None = None,
+        query_rewriter: QueryRewriter | None = None,
         detector: HallucinationDetector | None = None,
         evaluator: RAGEvaluator | None = None,
     ):
@@ -45,6 +47,11 @@ class RAGHallucinationPipeline:
         self.embedder = embedder
         mock_llm = self.settings.mock_llm or not self._has_provider_key(self.settings.llm_provider)
         self.generator = generator or LLMGenerator(
+            provider=self.settings.llm_provider,
+            model=self.settings.active_model,
+            mock_mode=mock_llm,
+        )
+        self.query_rewriter = query_rewriter or QueryRewriter(
             provider=self.settings.llm_provider,
             model=self.settings.active_model,
             mock_mode=mock_llm,
@@ -101,6 +108,8 @@ class RAGHallucinationPipeline:
 
         return {
             "question": question,
+            "retrieval_query": query,
+            "query_rewritten": query != question.strip(),
             "answer": generation.answer,
             "contexts": [_retrieved_chunk_to_dict(context) for context in contexts],
             "unsupported_spans": [
@@ -117,7 +126,7 @@ class RAGHallucinationPipeline:
         }
 
     def _rewrite_query(self, question: str) -> str:
-        return question
+        return self.query_rewriter.rewrite(question).rewritten_query
 
     def _rerank(self, query: str, contexts: list[RetrievedChunk]) -> list[RetrievedChunk]:
         return contexts

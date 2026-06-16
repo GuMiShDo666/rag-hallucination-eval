@@ -102,6 +102,10 @@ def _ask_question(question: str) -> None:
 
     st.subheader("Answer")
     st.write(result["answer"])
+    st.caption(
+        f"retrieval_query={result.get('retrieval_query', question)} "
+        f"query_rewritten={result.get('query_rewritten', False)}"
+    )
 
     metric_cols = st.columns(5)
     metric_cols[0].metric("hallucination_rate", _format_metric(result.get("hallucination_rate")))
