@@ -37,11 +37,13 @@ rag-hallucination-eval/
 ├── app/
 │   └── streamlit_app.py
 ├── data/
-│   ├── eval_set.json
-│   ├── eval_set_1000.json
-│   ├── processed/
-│   └── raw_docs/
-│       └── sample_llm_notes.md
+│   ├── documents/
+│   │   └── sample_llm_notes.md
+│   ├── eval_sets/
+│   │   ├── sample.json
+│   │   └── ragbench_covidqa_1000.json
+│   ├── imported/
+│   └── processed/
 ├── experiments/
 │   ├── run_baseline.py
 │   ├── run_ablation.py
@@ -186,7 +188,7 @@ Import an external evaluation dataset:
 python scripts/import_datasets.py \
   --source ragbench \
   --input /path/to/ragbench.jsonl \
-  --output data/imported/ragbench_eval.json \
+  --output data/eval_sets/ragbench_eval.json \
   --limit 1000 \
   --require-context
 ```
@@ -200,10 +202,10 @@ python scripts/download_ragbench_sample.py \
   --subset covidqa \
   --split train \
   --limit 1000 \
-  --output data/eval_set_1000.json
+  --output data/eval_sets/ragbench_covidqa_1000.json
 ```
 
-The repository includes `data/eval_set_1000.json`, sourced from RAGBench `covidqa/train`. It contains 1000 rows: 858 `supported` rows and 142 `unsupported` rows.
+The repository includes `data/eval_sets/ragbench_covidqa_1000.json`, sourced from RAGBench `covidqa/train`. It contains 1000 rows: 858 `supported` rows and 142 `unsupported` rows.
 
 ### Run Results
 

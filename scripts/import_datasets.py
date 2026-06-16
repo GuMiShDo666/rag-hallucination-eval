@@ -84,7 +84,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Import external RAG evaluation datasets.")
     parser.add_argument("--source", choices=sorted(SOURCE_DEFAULTS), required=True)
     parser.add_argument("--input", required=True, help="Input .json, .jsonl, or .csv file.")
-    parser.add_argument("--output", default="data/imported/eval_set_imported.json")
+    parser.add_argument("--output", default="data/eval_sets/imported_eval_set.json")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--append", action="store_true", help="Append imported rows to an existing output file.")
     parser.add_argument("--require-context", action="store_true", help="Drop rows without a usable context field.")

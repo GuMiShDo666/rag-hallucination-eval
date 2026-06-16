@@ -20,8 +20,8 @@ def parse_args() -> argparse.Namespace:
     """Parse baseline experiment arguments."""
 
     parser = argparse.ArgumentParser(description="Run baseline RAG hallucination evaluation.")
-    parser.add_argument("--docs", default="data/raw_docs", help="Directory containing source documents.")
-    parser.add_argument("--eval", default="data/eval_set.json", help="Evaluation set JSON path.")
+    parser.add_argument("--docs", default="data/documents", help="Directory containing source documents.")
+    parser.add_argument("--eval", default="data/eval_sets/sample.json", help="Evaluation set JSON path.")
     parser.add_argument("--output", default="results/baseline_results.csv", help="Output CSV path.")
     parser.add_argument("--chunk_size", type=int, default=512)
     parser.add_argument("--chunk_overlap", type=int, default=80)

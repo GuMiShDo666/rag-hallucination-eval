@@ -37,11 +37,13 @@ rag-hallucination-eval/
 ├── app/
 │   └── streamlit_app.py              # Streamlit demo
 ├── data/
-│   ├── eval_set.json                 # 示例评测集
-│   ├── eval_set_1000.json            # RAGBench covidqa/train 1000 条评测集
-│   ├── processed/                    # FAISS 索引输出目录
-│   └── raw_docs/
-│       └── sample_llm_notes.md       # 示例知识库文档
+│   ├── documents/                    # 示例知识库文档
+│   │   └── sample_llm_notes.md
+│   ├── eval_sets/                    # 项目评测集
+│   │   ├── sample.json               # 5 条示例评测集
+│   │   └── ragbench_covidqa_1000.json # RAGBench covidqa/train 1000 条评测集
+│   ├── imported/                     # 本地导入和下载缓存
+│   └── processed/                    # FAISS 索引输出目录
 ├── experiments/
 │   ├── run_baseline.py               # baseline 评测
 │   ├── run_ablation.py               # chunk/top-k 消融实验
@@ -186,7 +188,7 @@ streamlit run app/streamlit_app.py
 python scripts/import_datasets.py \
   --source ragbench \
   --input /path/to/ragbench.jsonl \
-  --output data/imported/ragbench_eval.json \
+  --output data/eval_sets/ragbench_eval.json \
   --limit 1000 \
   --require-context
 ```
@@ -200,10 +202,10 @@ python scripts/download_ragbench_sample.py \
   --subset covidqa \
   --split train \
   --limit 1000 \
-  --output data/eval_set_1000.json
+  --output data/eval_sets/ragbench_covidqa_1000.json
 ```
 
-当前仓库已包含 `data/eval_set_1000.json`，来源为 RAGBench `covidqa/train`，共 1000 条，其中 `supported` 858 条、`unsupported` 142 条。
+当前仓库已包含 `data/eval_sets/ragbench_covidqa_1000.json`，来源为 RAGBench `covidqa/train`，共 1000 条，其中 `supported` 858 条、`unsupported` 142 条。
 
 ### 运行结果展示
 

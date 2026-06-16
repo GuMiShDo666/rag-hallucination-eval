@@ -22,8 +22,8 @@ def parse_args() -> argparse.Namespace:
     """Parse ablation experiment arguments."""
 
     parser = argparse.ArgumentParser(description="Run RAG retrieval-strategy ablation experiments.")
-    parser.add_argument("--docs", default="data/raw_docs", help="Directory containing source documents.")
-    parser.add_argument("--eval", default="data/eval_set.json", help="Evaluation set JSON path.")
+    parser.add_argument("--docs", default="data/documents", help="Directory containing source documents.")
+    parser.add_argument("--eval", default="data/eval_sets/sample.json", help="Evaluation set JSON path.")
     parser.add_argument("--output", default="results/ablation_results.csv", help="Output CSV path.")
     return parser.parse_args()
 

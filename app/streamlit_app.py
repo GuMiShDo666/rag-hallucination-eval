@@ -25,7 +25,7 @@ def main() -> None:
     st.title("RAG Hallucination Eval")
 
     with st.sidebar:
-        docs_path = st.text_input("docs_path", value="data/raw_docs")
+        docs_path = st.text_input("docs_path", value="data/documents")
         chunk_size = st.slider("chunk_size", min_value=128, max_value=1536, value=512, step=128)
         max_overlap = max(0, chunk_size - 1)
         chunk_overlap = st.slider("chunk_overlap", min_value=0, max_value=max_overlap, value=min(80, max_overlap), step=16)

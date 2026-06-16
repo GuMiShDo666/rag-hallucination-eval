@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--subset", default="covidqa")
     parser.add_argument("--split", default="train")
     parser.add_argument("--limit", type=int, default=1000)
-    parser.add_argument("--output", default="data/eval_set_1000.json")
+    parser.add_argument("--output", default="data/eval_sets/ragbench_covidqa_1000.json")
     parser.add_argument("--cache-dir", default="data/imported/cache")
     return parser.parse_args()
 

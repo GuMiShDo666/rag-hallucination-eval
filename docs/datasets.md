@@ -39,7 +39,7 @@ The importer accepts `.json`, `.jsonl`, `.csv`, and `.parquet` files:
 python scripts/import_datasets.py \
   --source ragbench \
   --input /path/to/ragbench.jsonl \
-  --output data/imported/ragbench_eval.json \
+  --output data/eval_sets/ragbench_eval.json \
   --limit 1000 \
   --require-context
 ```
@@ -50,7 +50,7 @@ RAGTruth-style input:
 python scripts/import_datasets.py \
   --source ragtruth \
   --input /path/to/ragtruth.csv \
-  --output data/imported/ragtruth_eval.json \
+  --output data/eval_sets/ragtruth_eval.json \
   --require-context
 ```
 
@@ -60,7 +60,7 @@ HaluEval-style input:
 python scripts/import_datasets.py \
   --source halueval \
   --input /path/to/halueval_qa.json \
-  --output data/imported/halueval_eval.json \
+  --output data/eval_sets/halueval_eval.json \
   --limit 1000
 ```
 
@@ -70,7 +70,7 @@ Generic input:
 python scripts/import_datasets.py \
   --source generic \
   --input /path/to/custom_eval.jsonl \
-  --output data/imported/custom_eval.json
+  --output data/eval_sets/custom_eval.json
 ```
 
 Use `--append` to add rows to an existing imported JSON file.
@@ -84,21 +84,21 @@ Use `--append` to add rows to an existing imported JSON file.
 | `halueval` | Right answer vs hallucinated answer pairs | `question`, `right_answer`, `hallucinated_answer`, `knowledge` |
 | `generic` | Custom local datasets | `question`, `reference_answer`, `gold_context`, `contexts` |
 
-Imported files are written under `data/imported/` by default.
+Imported eval sets are written under `data/eval_sets/` by default. Download caches stay under `data/imported/cache/`.
 
 ## Build a 1000-Row Local Eval Set
 
-RAGBench is published as `galileo-ai/ragbench` on Hugging Face under `cc-by-4.0`. The helper below downloads the `covidqa/train` parquet split and writes the first 1000 normalized rows to `data/eval_set_1000.json`:
+RAGBench is published as `galileo-ai/ragbench` on Hugging Face under `cc-by-4.0`. The helper below downloads the `covidqa/train` parquet split and writes the first 1000 normalized rows to `data/eval_sets/ragbench_covidqa_1000.json`:
 
 ```bash
 python scripts/download_ragbench_sample.py \
   --subset covidqa \
   --split train \
   --limit 1000 \
-  --output data/eval_set_1000.json
+  --output data/eval_sets/ragbench_covidqa_1000.json
 ```
 
-The checked-in `data/eval_set_1000.json` file was generated from RAGBench `covidqa/train` and contains:
+The checked-in `data/eval_sets/ragbench_covidqa_1000.json` file was generated from RAGBench `covidqa/train` and contains:
 
 | Field | Value |
 |---|---:|
@@ -112,6 +112,6 @@ Use it with the baseline runner:
 
 ```bash
 MOCK_LLM=true python experiments/run_baseline.py \
-  --eval data/eval_set_1000.json \
+  --eval data/eval_sets/ragbench_covidqa_1000.json \
   --output results/baseline_1000_results.csv
 ```
