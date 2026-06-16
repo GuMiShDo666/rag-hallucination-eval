@@ -1,0 +1,2 @@
+id,query,response,source_info,hallucination_type
+rt-1,Does RAG guarantee factual correctness?,RAG does not automatically guarantee factual correctness.,RAG can still produce unsupported claims if retrieval is incomplete.,unsupported

@@ -179,6 +179,19 @@ streamlit run app/streamlit_app.py
 
 Open `http://localhost:8501`, click `Build Index`, ask a question, and inspect the answer, retrieved contexts, unsupported spans, and metrics.
 
+Import an external evaluation dataset:
+
+```bash
+python scripts/import_datasets.py \
+  --source ragbench \
+  --input /path/to/ragbench.jsonl \
+  --output data/imported/ragbench_eval.json \
+  --limit 1000 \
+  --require-context
+```
+
+Supported import profiles are `ragtruth`, `ragbench`, `halueval`, and `generic`. See [docs/datasets.md](docs/datasets.md).
+
 ### Run Results
 
 Baseline output:

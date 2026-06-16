@@ -1,0 +1,9 @@
+[
+  {
+    "id": "he-1",
+    "question": "What problem does LoRA solve?",
+    "right_answer": "LoRA reduces trainable parameters during fine-tuning.",
+    "hallucinated_answer": "LoRA increases the number of trainable parameters.",
+    "knowledge": "LoRA reduces the number of trainable parameters by injecting low-rank matrices into model weights."
+  }
+]

@@ -11,6 +11,8 @@ __pycache__/
 
 data/processed/*
 !data/processed/.gitkeep
+data/imported/*
+!data/imported/.gitkeep
 results/*.csv
 results/ablation_runs/*
 results/.cache/

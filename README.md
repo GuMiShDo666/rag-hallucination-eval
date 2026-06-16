@@ -179,6 +179,19 @@ streamlit run app/streamlit_app.py
 
 打开 `http://localhost:8501`，点击 `Build Index`，输入问题后点击 `Ask`，即可查看生成答案、检索上下文、unsupported spans 和评测指标。
 
+导入外部评测集：
+
+```bash
+python scripts/import_datasets.py \
+  --source ragbench \
+  --input /path/to/ragbench.jsonl \
+  --output data/imported/ragbench_eval.json \
+  --limit 1000 \
+  --require-context
+```
+
+支持 `ragtruth`、`ragbench`、`halueval`、`generic` 四种导入 profile，详见 [docs/datasets.md](docs/datasets.md)。
+
 ### 运行结果展示
 
 baseline 运行输出：

@@ -1,0 +1,1 @@
+{"id":"rb-1","question":"Why is RAG used?","response":"RAG grounds answers in retrieved documents.","documents":["RAG combines retrieval with generation to ground answers in external documents."],"label":"grounded"}
