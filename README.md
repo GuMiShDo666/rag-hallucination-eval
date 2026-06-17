@@ -229,6 +229,8 @@ Wrote docs/test.md
 | oracle_faithfulness | 0.9102 |
 | retrieved_faithfulness | 0.3895 |
 
+![1000 条 RAGBench 本地测试结果](docs/assets/test_results.png)
+
 完整报告见 [docs/test.md](docs/test.md)。
 
 ## 项目结构

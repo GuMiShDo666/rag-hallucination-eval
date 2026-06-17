@@ -229,6 +229,8 @@ Retrieval and quality metrics:
 | oracle_faithfulness | 0.9102 |
 | retrieved_faithfulness | 0.3895 |
 
+![1000-row local RAGBench test results](docs/assets/test_results.png)
+
 See [docs/test.md](docs/test.md) for the full report.
 
 ## Directory Layout
