@@ -172,13 +172,13 @@ Generate plots:
 python experiments/plot_results.py
 ```
 
-Run the 1000-row local RAGBench stress test:
+Run the local RAGBench test:
 
 ```bash
-python experiments/run_large_rag_eval.py --limit 1000
+python experiments/run_test.py --limit 1000
 ```
 
-See [docs/large_rag_eval.md](docs/large_rag_eval.md) for the stress-test report.
+See [docs/test.md](docs/test.md) for the test report.
 
 Import an external evaluation dataset:
 
@@ -197,46 +197,39 @@ This repository includes `data/eval_sets/ragbench_covidqa_1000.json`, sourced fr
 
 ## Results
 
-Baseline output:
+1000-row local RAGBench test output:
 
 ```text
-Saved 5 rows to results/baseline_results.csv
-avg_faithfulness: 1.0000
-avg_answer_relevancy: 0.3919
-avg_context_precision: 0.4000
-avg_hallucination_rate: 0.0000
+Evaluated 1000 rows
+oracle_context:   accuracy=0.7760 precision=0.1694 recall=0.1479 f1=0.1579
+retrieved_context: accuracy=0.4010 precision=0.1522 recall=0.7042 f1=0.2503
+retrieval_source_hit_rate: 0.3560
+Wrote results/test/per_sample.csv
+Wrote results/test/summary.json
+Wrote docs/test.md
 ```
 
-Baseline metrics:
+Classification metrics:
+
+| Mode | Accuracy | Precision | Recall | F1 | TP | FP | TN | FN |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| oracle_context | 0.7760 | 0.1694 | 0.1479 | 0.1579 | 21 | 103 | 755 | 121 |
+| retrieved_context | 0.4010 | 0.1522 | 0.7042 | 0.2503 | 100 | 557 | 301 | 42 |
+
+Retrieval and quality metrics:
 
 | Metric | Value |
 |---|---:|
-| Samples | 5 |
-| avg_faithfulness | 1.0000 |
-| avg_answer_relevancy | 0.3919 |
-| avg_context_precision | 0.4000 |
-| avg_hallucination_rate | 0.0000 |
+| Samples | 1000 |
+| retrieval_source_hit_rate | 0.3560 |
+| retrieved_context_precision | 0.0814 |
+| avg_max_retrieved_score | 0.4463 |
+| oracle_hallucination_rate | 0.0898 |
+| retrieved_hallucination_rate | 0.6105 |
+| oracle_faithfulness | 0.9102 |
+| retrieved_faithfulness | 0.3895 |
 
-Ablation summary:
-
-| Setting | Faithfulness | Answer Relevancy | Context Precision | Hallucination Rate |
-|---|---:|---:|---:|---:|
-| chunk_size_256 | 1.0000 | 0.2417 | 0.2800 | 0.0000 |
-| chunk_size_512 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-| chunk_size_1024 | 1.0000 | 0.3253 | 1.0000 | 0.0000 |
-| top_k_3 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-| top_k_5 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-| top_k_8 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-
-Generated plots:
-
-![Chunk Size Hallucination Rate](docs/assets/chunk_size_hallucination_rate.png)
-
-![Top-K Faithfulness](docs/assets/top_k_faithfulness.png)
-
-![Baseline vs Reranker](docs/assets/baseline_vs_reranker.png)
-
-![Baseline vs Query Rewrite](docs/assets/baseline_vs_query_rewrite.png)
+See [docs/test.md](docs/test.md) for the full report.
 
 ## Directory Layout
 

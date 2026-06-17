@@ -1,6 +1,6 @@
-# Large Local RAG Evaluation
+# Local RAG Test
 
-This experiment builds a local RAG corpus from `data/eval_sets/ragbench_covidqa_1000.json` and evaluates 1000 RAGBench candidate answers against the project hallucination detector.
+This experiment builds a local RAG corpus from `data/eval_sets/ragbench_covidqa_1000.json` and evaluates RAGBench candidate answers against the project hallucination detector.
 
 ## Setup
 
@@ -44,7 +44,7 @@ Two modes were measured:
 
 ## Interpretation
 
-The previous 100% results came from the tiny 5-row sample set and mock generation that copied heavily from retrieved context. On the 1000-row RAGBench sample, the current local fallback detector has high overall accuracy mainly because supported answers dominate the dataset, but it has low precision and recall for hallucinated or unsupported answers.
+The previous 100% results came from the tiny 5-row sample set and mock generation that copied heavily from retrieved context. On the RAGBench sample, the current local fallback detector has high overall accuracy mainly because supported answers dominate the dataset, but it has low precision and recall for hallucinated or unsupported answers.
 
 The main bottleneck is the detector: it relies on lexical overlap, so it misses many unsupported answers that reuse terms from the context, and it can flag supported answers when wording differs from the gold context.
 
@@ -52,5 +52,5 @@ The main bottleneck is the detector: it relies on lexical overlap, so it misses 
 
 | File | Description |
 |---|---|
-| `results/large_rag_eval/per_sample.csv` | Per-sample predictions and metrics |
-| `results/large_rag_eval/summary.json` | Aggregate metrics JSON |
+| `results/test/per_sample.csv` | Per-sample predictions and metrics |
+| `results/test/summary.json` | Aggregate metrics JSON |

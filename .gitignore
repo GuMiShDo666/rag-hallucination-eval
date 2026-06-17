@@ -15,7 +15,7 @@ data/imported/*
 !data/imported/.gitkeep
 results/*.csv
 results/ablation_runs/*
-results/large_rag_eval/*
+results/test/*
 results/.cache/
 results/.matplotlib-cache/
 results/figures/*

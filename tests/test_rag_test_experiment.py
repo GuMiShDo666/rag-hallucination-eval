@@ -1,4 +1,4 @@
-from experiments.run_large_rag_eval import (
+from experiments.run_test import (
     classification_metrics,
     expected_is_hallucinated,
     prediction_is_hallucinated,

@@ -172,13 +172,13 @@ python experiments/run_ablation.py
 python experiments/plot_results.py
 ```
 
-运行 1000 条本地 RAGBench 压测：
+运行本地 RAGBench 测试：
 
 ```bash
-python experiments/run_large_rag_eval.py --limit 1000
+python experiments/run_test.py --limit 1000
 ```
 
-压测报告见 [docs/large_rag_eval.md](docs/large_rag_eval.md)。
+测试报告见 [docs/test.md](docs/test.md)。
 
 导入外部评测集：
 
@@ -197,46 +197,39 @@ python scripts/import_datasets.py \
 
 ## 运行结果展示
 
-Baseline 输出：
+1000 条 RAGBench 本地测试输出：
 
 ```text
-Saved 5 rows to results/baseline_results.csv
-avg_faithfulness: 1.0000
-avg_answer_relevancy: 0.3919
-avg_context_precision: 0.4000
-avg_hallucination_rate: 0.0000
+Evaluated 1000 rows
+oracle_context:   accuracy=0.7760 precision=0.1694 recall=0.1479 f1=0.1579
+retrieved_context: accuracy=0.4010 precision=0.1522 recall=0.7042 f1=0.2503
+retrieval_source_hit_rate: 0.3560
+Wrote results/test/per_sample.csv
+Wrote results/test/summary.json
+Wrote docs/test.md
 ```
 
-Baseline 指标：
+分类指标：
+
+| 模式 | Accuracy | Precision | Recall | F1 | TP | FP | TN | FN |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| oracle_context | 0.7760 | 0.1694 | 0.1479 | 0.1579 | 21 | 103 | 755 | 121 |
+| retrieved_context | 0.4010 | 0.1522 | 0.7042 | 0.2503 | 100 | 557 | 301 | 42 |
+
+检索与质量指标：
 
 | 指标 | 结果 |
 |---|---:|
-| 样本数量 | 5 |
-| avg_faithfulness | 1.0000 |
-| avg_answer_relevancy | 0.3919 |
-| avg_context_precision | 0.4000 |
-| avg_hallucination_rate | 0.0000 |
+| 样本数量 | 1000 |
+| retrieval_source_hit_rate | 0.3560 |
+| retrieved_context_precision | 0.0814 |
+| avg_max_retrieved_score | 0.4463 |
+| oracle_hallucination_rate | 0.0898 |
+| retrieved_hallucination_rate | 0.6105 |
+| oracle_faithfulness | 0.9102 |
+| retrieved_faithfulness | 0.3895 |
 
-消融实验摘要：
-
-| setting | faithfulness | answer_relevancy | context_precision | hallucination_rate |
-|---|---:|---:|---:|---:|
-| chunk_size_256 | 1.0000 | 0.2417 | 0.2800 | 0.0000 |
-| chunk_size_512 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-| chunk_size_1024 | 1.0000 | 0.3253 | 1.0000 | 0.0000 |
-| top_k_3 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-| top_k_5 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-| top_k_8 | 1.0000 | 0.3919 | 0.4000 | 0.0000 |
-
-图表输出：
-
-![Chunk Size Hallucination Rate](docs/assets/chunk_size_hallucination_rate.png)
-
-![Top-K Faithfulness](docs/assets/top_k_faithfulness.png)
-
-![Baseline vs Reranker](docs/assets/baseline_vs_reranker.png)
-
-![Baseline vs Query Rewrite](docs/assets/baseline_vs_query_rewrite.png)
+完整报告见 [docs/test.md](docs/test.md)。
 
 ## 项目结构
 

@@ -1,4 +1,4 @@
-"""Run a 1000-row local RAG hallucination stress test.
+"""Run the local RAG hallucination test.
 
 The experiment uses an existing RAGBench-style eval file with `gold_context`,
 `candidate_answer`, and `risk_type` fields. It builds a local FAISS retriever
@@ -11,6 +11,7 @@ from the gold contexts, then evaluates hallucination detection in two modes:
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 import sys
@@ -19,8 +20,6 @@ from typing import Any
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
-
-import pandas as pd
 
 from src.chunker import split_documents
 from src.document_loader import Document
@@ -35,14 +34,14 @@ SUPPORTED_LABELS = {"supported"}
 def parse_args() -> argparse.Namespace:
     """Parse CLI arguments."""
 
-    parser = argparse.ArgumentParser(description="Run a local 1000-row RAG hallucination stress test.")
+    parser = argparse.ArgumentParser(description="Run the local RAG hallucination test.")
     parser.add_argument("--eval", default="data/eval_sets/ragbench_covidqa_1000.json")
     parser.add_argument("--limit", type=int, default=1000)
     parser.add_argument("--chunk-size", type=int, default=1200)
     parser.add_argument("--chunk-overlap", type=int, default=120)
     parser.add_argument("--top-k", type=int, default=5)
-    parser.add_argument("--output-dir", default="results/large_rag_eval")
-    parser.add_argument("--report", default="docs/large_rag_eval.md")
+    parser.add_argument("--output-dir", default="results/test")
+    parser.add_argument("--report", default="docs/test.md")
     return parser.parse_args()
 
 
@@ -58,21 +57,20 @@ def main() -> None:
     )
 
     rows = evaluate_items(items, retriever, top_k=args.top_k)
-    dataframe = pd.DataFrame(rows)
-    summary = build_summary(dataframe, args)
+    summary = build_summary(rows, args)
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     csv_path = output_dir / "per_sample.csv"
     summary_path = output_dir / "summary.json"
-    dataframe.to_csv(csv_path, index=False)
+    write_csv(rows, csv_path)
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
 
     report_path = Path(args.report)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(render_report(summary, csv_path, summary_path), encoding="utf-8")
 
-    print(f"Evaluated {len(dataframe)} rows")
+    print(f"Evaluated {len(rows)} rows")
     print(f"oracle_context:   {format_metrics(summary['oracle_context'])}")
     print(f"retrieved_context: {format_metrics(summary['retrieved_context'])}")
     print(f"retrieval_source_hit_rate: {summary['retrieval']['source_hit_rate']:.4f}")
@@ -82,7 +80,7 @@ def main() -> None:
 
 
 def load_eval_items(eval_path: str, limit: int) -> list[dict[str, Any]]:
-    """Load eval rows with fields required for the large local experiment."""
+    """Load eval rows with fields required for the local test."""
 
     path = Path(eval_path)
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -228,34 +226,48 @@ def retrieval_source_hit(retrieved: list[RetrievedChunk], expected_source_id: st
     return expected_source_id in retrieved_source_ids(retrieved)
 
 
-def build_summary(dataframe: pd.DataFrame, args: argparse.Namespace) -> dict[str, Any]:
+def write_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
+    """Write per-sample rows without requiring pandas."""
+
+    if not rows:
+        output_path.write_text("", encoding="utf-8")
+        return
+
+    with output_path.open("w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=list(rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def build_summary(rows: list[dict[str, Any]], args: argparse.Namespace) -> dict[str, Any]:
     """Build aggregate metrics for the experiment."""
 
+    risk_types = [str(row["risk_type"]) for row in rows]
     return {
         "dataset": args.eval,
-        "num_samples": int(len(dataframe)),
+        "num_samples": int(len(rows)),
         "chunk_size": args.chunk_size,
         "chunk_overlap": args.chunk_overlap,
         "top_k": args.top_k,
-        "label_distribution": dataframe["risk_type"].value_counts().to_dict(),
+        "label_distribution": {label: risk_types.count(label) for label in sorted(set(risk_types))},
         "oracle_context": classification_metrics(
-            dataframe["expected_hallucinated"].tolist(),
-            dataframe["oracle_pred_hallucinated"].tolist(),
+            [bool(row["expected_hallucinated"]) for row in rows],
+            [bool(row["oracle_pred_hallucinated"]) for row in rows],
         ),
         "retrieved_context": classification_metrics(
-            dataframe["expected_hallucinated"].tolist(),
-            dataframe["retrieved_pred_hallucinated"].tolist(),
+            [bool(row["expected_hallucinated"]) for row in rows],
+            [bool(row["retrieved_pred_hallucinated"]) for row in rows],
         ),
         "averages": {
-            "oracle_hallucination_rate": _mean(dataframe, "oracle_hallucination_rate"),
-            "retrieved_hallucination_rate": _mean(dataframe, "retrieved_hallucination_rate"),
-            "oracle_faithfulness": _mean(dataframe, "oracle_faithfulness"),
-            "retrieved_faithfulness": _mean(dataframe, "retrieved_faithfulness"),
-            "retrieved_context_precision": _mean(dataframe, "retrieved_context_precision"),
+            "oracle_hallucination_rate": _mean(rows, "oracle_hallucination_rate"),
+            "retrieved_hallucination_rate": _mean(rows, "retrieved_hallucination_rate"),
+            "oracle_faithfulness": _mean(rows, "oracle_faithfulness"),
+            "retrieved_faithfulness": _mean(rows, "retrieved_faithfulness"),
+            "retrieved_context_precision": _mean(rows, "retrieved_context_precision"),
         },
         "retrieval": {
-            "source_hit_rate": float(dataframe["retrieval_source_hit"].mean()),
-            "avg_max_retrieved_score": _mean(dataframe, "max_retrieved_score"),
+            "source_hit_rate": _mean(rows, "retrieval_source_hit"),
+            "avg_max_retrieved_score": _mean(rows, "max_retrieved_score"),
         },
     }
 
@@ -297,9 +309,9 @@ def render_report(summary: dict[str, Any], csv_path: Path, summary_path: Path) -
     averages = summary["averages"]
     retrieval = summary["retrieval"]
 
-    return f"""# Large Local RAG Evaluation
+    return f"""# Local RAG Test
 
-This experiment builds a local RAG corpus from `{summary['dataset']}` and evaluates 1000 RAGBench candidate answers against the project hallucination detector.
+This experiment builds a local RAG corpus from `{summary['dataset']}` and evaluates RAGBench candidate answers against the project hallucination detector.
 
 ## Setup
 
@@ -343,7 +355,7 @@ Two modes were measured:
 
 ## Interpretation
 
-The previous 100% results came from the tiny 5-row sample set and mock generation that copied heavily from retrieved context. On the 1000-row RAGBench sample, the current local fallback detector has high overall accuracy mainly because supported answers dominate the dataset, but it has low precision and recall for hallucinated or unsupported answers.
+The previous 100% results came from the tiny 5-row sample set and mock generation that copied heavily from retrieved context. On the RAGBench sample, the current local fallback detector has high overall accuracy mainly because supported answers dominate the dataset, but it has low precision and recall for hallucinated or unsupported answers.
 
 The main bottleneck is the detector: it relies on lexical overlap, so it misses many unsupported answers that reuse terms from the context, and it can flag supported answers when wording differs from the gold context.
 
@@ -371,9 +383,9 @@ def _safe_div(numerator: float, denominator: float) -> float:
     return float(numerator / denominator) if denominator else 0.0
 
 
-def _mean(dataframe: pd.DataFrame, column: str) -> float:
-    value = dataframe[column].dropna().mean()
-    return float(value) if value == value else 0.0
+def _mean(rows: list[dict[str, Any]], column: str) -> float:
+    values = [float(row[column]) for row in rows if row.get(column) is not None]
+    return sum(values) / len(values) if values else 0.0
 
 
 if __name__ == "__main__":
